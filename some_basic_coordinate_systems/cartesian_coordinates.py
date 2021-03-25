@@ -32,18 +32,18 @@ def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
         if starting_point is None:
             starting_point = [0, 0]
 
-        new_x_distance = starting_point[0] + xy_distance[0]
-        new_y_distance = starting_point[1] + xy_distance[1]
+        new_x_position = starting_point[0] + xy_distance[0]
+        new_y_position = starting_point[1] + xy_distance[1]
 
         print(
             'The starting position of the object is {}.\n'
             'After moving <x: {}, y: {}> units, the new coordinates are '
             '<{}, {}>.'.format(
-                starting_point, xy_distance[0], xy_distance[1], new_x_distance, new_y_distance
+                starting_point, xy_distance[0], xy_distance[1], new_x_position, new_y_position
             )
         )
 
-        return [new_x_distance, new_y_distance]
+        return [new_x_position, new_y_position]
 
     except eb.ListNotGiven:
         em.ListNotGiven()
@@ -85,19 +85,19 @@ def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int, int] 
         if starting_point is None:
             starting_point = [0, 0, 0]
 
-        new_x_distance = starting_point[0] + xyz_distance[0]
-        new_y_distance = starting_point[1] + xyz_distance[1]
-        new_z_distance = starting_point[2] + xyz_distance[2]
+        new_x_position = starting_point[0] + xyz_distance[0]
+        new_y_position = starting_point[1] + xyz_distance[1]
+        new_z_position = starting_point[2] + xyz_distance[2]
 
         print(
             'The starting point of the object is {}.\n'
             'After moving <x: {}, y: {}, z: {}> units, the new coorindates '
             'are <{}, {}, {}>.'.format(
-                starting_point, xyz_distance[0], xyz_distance[1], xyz_distance[2], new_x_distance, new_y_distance, new_z_distance
+                starting_point, xyz_distance[0], xyz_distance[1], xyz_distance[2], new_x_position, new_y_position, new_z_position
             )
         )
 
-        return [new_x_distance, new_y_distance, new_z_distance]
+        return [new_x_position, new_y_position, new_z_position]
 
     except eb.ListNotGiven:
         em.ListNotGiven()
