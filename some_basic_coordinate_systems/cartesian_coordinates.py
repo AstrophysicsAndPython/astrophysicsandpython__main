@@ -59,7 +59,7 @@ def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
         print('The starting point must be a list with two values.')
 
 
-def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int] = None) -> [int, int, int]:
+def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int, int] = None) -> [int, int, int]:
 
     try:
 
