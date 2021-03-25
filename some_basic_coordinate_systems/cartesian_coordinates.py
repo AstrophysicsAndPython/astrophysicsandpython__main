@@ -13,16 +13,22 @@ import errors.error_messages as em
 def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
 
     try:
+
         if type(xy_distance) != list:
             raise eb.ListNotGiven
+
         if len(xy_distance) > 2:
             raise eb.ExtraParameterGiven
+
         if len(xy_distance) < 2:
+
             if len(xy_distance) == 0:
                 raise eb.EmptyList
+
             elif len(xy_distance) == 1:
                 em.AssumeX()
                 xy_distance.append(0)
+
         if starting_point is None:
             starting_point = [0, 0]
 
@@ -41,11 +47,14 @@ def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
 
     except eb.ListNotGiven:
         em.ListNotGiven()
+
     except eb.ExtraParameterGiven:
         em.ExtraParameterGiven(2, len(xy_distance))
         return [None]*2
+
     except eb.EmptyList:
         em.EmptyList(2)
+
     except IndexError:
         print('The starting point must be a list with two values.')
 
@@ -53,19 +62,26 @@ def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
 def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int] = None) -> [int, int, int]:
 
     try:
+
         if type(xyz_distance) != list:
             raise eb.ListNotGiven
+
         if len(xyz_distance) > 3:
             raise eb.ExtraParameterGiven
+
         if xyz_distance.__len__() < 3:
+
             if len(xyz_distance) == 0:
                 raise eb.EmptyList
+
             elif len(xyz_distance) == 1:
                 em.AssumeX()
                 xyz_distance.extend([0, 0])
+
             elif len(xyz_distance) == 2:
                 em.AssumeXY()
                 xyz_distance.append(0)
+
         if starting_point is None:
             starting_point = [0, 0, 0]
 
@@ -85,10 +101,13 @@ def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int] = Non
 
     except eb.ListNotGiven:
         em.ListNotGiven()
+
     except eb.ExtraParameterGiven:
         em.ExtraParameterGiven(3, len(xyz_distance))
         return [None]*3
+
     except eb.EmptyList:
         em.EmptyList(3)
+
     except IndexError:
         print('The starting point must be a list with three values.')
