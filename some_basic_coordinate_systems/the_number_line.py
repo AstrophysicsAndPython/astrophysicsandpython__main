@@ -11,7 +11,6 @@ import errors.error_messages as em
 
 
 def number_line_with_direction(magnitude: int, starting_position: int = 0) -> int:
-
     try:
 
         if type(magnitude) != int:
@@ -19,19 +18,17 @@ def number_line_with_direction(magnitude: int, starting_position: int = 0) -> in
 
         obj_position = starting_position + magnitude
 
-        print(
-            'The starting position of the object is {}.\n'
-            'With a magnitude of {}, the final position of the object '
-            'is {}.'.format(starting_position, magnitude, obj_position)
-        )
+        print('The starting position of the object is {}.\n'
+              'With a magnitude of {}, the final position of the object '
+              'is {}.'.format(starting_position, magnitude, obj_position))
 
         return obj_position
 
     except eb.IntNotPassed:
         em.IntNotPassed()
 
-def number_line_no_direction(magnitude: int, starting_position: int = 0) -> [int, int]:
 
+def number_line_no_direction(magnitude: int, starting_position: int = 0) -> [int, int]:
     try:
 
         if type(magnitude) != int:
@@ -43,11 +40,9 @@ def number_line_no_direction(magnitude: int, starting_position: int = 0) -> [int
         obj_position_positive = starting_position + magnitude
         obj_position_negative = starting_position - magnitude
 
-        print(
-            'The starting position is {}.\n'
-            'With no direction specified, the object can have either'
-            '{} or {} position.'.format(starting_position, obj_position_negative, obj_position_positive)
-        )
+        print('The starting position is {}.\n'
+              'With no direction specified, the object can have either'
+              '{} or {} position.'.format(starting_position, obj_position_negative, obj_position_positive))
 
         return [obj_position_positive, obj_position_negative]
 
@@ -59,7 +54,6 @@ def number_line_no_direction(magnitude: int, starting_position: int = 0) -> [int
 
 
 def number_line_separate_direction(magnitude: int, direction: str, starting_position: int = 0) -> int:
-
     try:
 
         if type(magnitude) != int:
@@ -77,11 +71,9 @@ def number_line_separate_direction(magnitude: int, direction: str, starting_posi
         else:
             obj_position = starting_position + magnitude
 
-        print(
-            'The starting position of the object is {}.\n'
-            'With a magnitude of {} and a {} direction, the current position is'
-            ' {}.'.format(starting_position, magnitude, direction, obj_position)
-        )
+        print('The starting position of the object is {}.\n'
+              'With a magnitude of {} and a {} direction, the current position is'
+              ' {}.'.format(starting_position, magnitude, direction, obj_position))
 
         return obj_position
 

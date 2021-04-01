@@ -8,106 +8,94 @@ Created on Thu Mar 24 09:06:45 2021
 
 import errors.error_base as eb
 import errors.error_messages as em
+from misc.misc import check_list_len_3d
 
 
-def cartesian_2d(xy_distance: list, starting_point: list = None) -> list:
+def distance_formula_3d(initial_coordinates, final_coordinates):
+    """
+    Provides Euclidean distance between two points in 3 or less dimensional space.
 
+    :param initial_coordinates: reference coordinates according to which the distance is to be calculated.
+    :param   final_coordinates: position of the object in the space under observation
+    :return                   : Euclidean distance between the two specified points
+
+    Note: To use distance_formula_3d for 2D, specify z as 0 in both lists or only give 2 element list.
+    """
     try:
 
-        if type(xy_distance) != list:
+        if type(initial_coordinates) != list or type(final_coordinates) != list:
             raise eb.ListNotGiven
 
-        if len(xy_distance) > 2:
+        elif len(initial_coordinates) > 3 or len(final_coordinates) > 3:
             raise eb.ExtraParameterGiven
 
-        if len(xy_distance) < 2:
+        if len(initial_coordinates) < 3:
+            initial_coordinates = list(check_list_len_3d(initial_coordinates))
 
-            if len(xy_distance) == 0:
-                raise eb.EmptyList
+        if len(final_coordinates) < 3:
+            final_coordinates = list(check_list_len_3d(final_coordinates))
 
-            elif len(xy_distance) == 1:
-                em.AssumeX()
-                xy_distance.append(0)
+        x1, y1, z1 = initial_coordinates
+        x2, y2, z2 = final_coordinates
 
-        if starting_point is None:
-            starting_point = [0, 0]
+        out = round(pow(pow(x2 - x1, 2) + pow(y2 - y1, 2) + pow(z2 - z1, 2), 0.5), 4)
 
-        new_x_position = starting_point[0] + xy_distance[0]
-        new_y_position = starting_point[1] + xy_distance[1]
+        print(f'The Euclidean distance between <{x1}, {y1}, {z1}> and <{x2}, {y2}, {z2}> is'
+              f' {out}.')
 
-        print(
-            'The starting position of the object is {}.\n'
-            'After moving <x: {}, y: {}> units, the new coordinates are '
-            '<{}, {}>.'.format(
-                starting_point, xy_distance[0], xy_distance[1], new_x_position, new_y_position
-            )
-        )
-
-        return [new_x_position, new_y_position]
+        return out
 
     except eb.ListNotGiven:
         em.ListNotGiven()
 
     except eb.ExtraParameterGiven:
-        em.ExtraParameterGiven(2, len(xy_distance))
-        return [None]*2
+        em.ExtraParameterGiven(3)
+        return None
 
-    except eb.EmptyList:
-        em.EmptyList(2)
-
-    except IndexError:
-        print('The starting point must be a list with two values.')
+    except TypeError:
+        pass
 
 
-def cartesian_3d(xyz_distance: [int, int, int], starting_point: [int, int, int] = None) -> [int, int, int]:
+def cartesian_3d(xyz_distance: [float, float, float], starting_point: [float, float, float] = None):
+    """
+    Provides Euclidean distance between two points in 3 or less dimensional space
+
+    :param   xyz_distance: position of the point in the space under observation
+    :param starting_point: reference coordinates according to which the new coordinates are to be calculated.
+    :return              : New Cartesian coordinates for the point.
+
+    :Note: To use cartesian_3d formula for 2D, specify z as 0 in both lists or only give 2 element list.
+    """
 
     try:
 
         if type(xyz_distance) != list:
             raise eb.ListNotGiven
 
-        if len(xyz_distance) > 3:
+        elif len(xyz_distance) > 3:
             raise eb.ExtraParameterGiven
 
-        if xyz_distance.__len__() < 3:
-
-            if len(xyz_distance) == 0:
-                raise eb.EmptyList
-
-            elif len(xyz_distance) == 1:
-                em.AssumeX()
-                xyz_distance.extend([0, 0])
-
-            elif len(xyz_distance) == 2:
-                em.AssumeXY()
-                xyz_distance.append(0)
+        elif len(xyz_distance) < 3:
+            xyz_distance = list(check_list_len_3d(xyz_distance))
 
         if starting_point is None:
             starting_point = [0, 0, 0]
 
-        new_x_position = starting_point[0] + xyz_distance[0]
-        new_y_position = starting_point[1] + xyz_distance[1]
-        new_z_position = starting_point[2] + xyz_distance[2]
+        x1, y1, z1 = xyz_distance
 
-        print(
-            'The starting point of the object is {}.\n'
-            'After moving <x: {}, y: {}, z: {}> units, the new coorindates '
-            'are <{}, {}, {}>.'.format(
-                starting_point, xyz_distance[0], xyz_distance[1], xyz_distance[2], new_x_position, new_y_position, new_z_position
-            )
-        )
+        new_x, new_y, new_z = [sum(x) for x in zip(starting_point, xyz_distance)]
 
-        return [new_x_position, new_y_position, new_z_position]
+        print(f'The starting point of the object is {starting_point}.\nAfter moving <{x1}, {y1}, {z1}> units, '
+              f'the new coordinates are <{new_x}, {new_y}, {new_z}>')
+
+        return [new_x, new_y, new_z]
 
     except eb.ListNotGiven:
         em.ListNotGiven()
 
     except eb.ExtraParameterGiven:
         em.ExtraParameterGiven(3, len(xyz_distance))
-        return [None]*3
-
-    except eb.EmptyList:
-        em.EmptyList(3)
+        return [None] * 3
 
     except IndexError:
         print('The starting point must be a list with three values.')

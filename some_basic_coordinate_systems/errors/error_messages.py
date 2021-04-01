@@ -24,16 +24,19 @@ def ListNotGiven():
 
 
 def ExtraParameterGiven(req=None, given=None):
-    print('{} parameters given in list, only {} are required.'.format(req, given))
+    if given is None:
+        print(f'Only {req} parameters are required.')
+    else:
+        print(f'{given} parameters given in list, only {req} are required.')
 
 
 def EmptyList(num=None):
-    print('Empty list passed. A list of {} inputs is required.'.format(num))
+    print(f'Empty list passed. A list of {num} is required.')
 
 
 def AssumeX():
-    print('Only one coordinate given, assuming the value to be movement in x coordinates.\n')
+    print('Only one coordinate given, assuming the value to be x coordinate.\n')
 
 
 def AssumeXY():
-    print('Only two coordinates give, assuming the values to be movement in x and y coordinates.\n')
+    print('Only two coordinates give, assuming the values to be x and y coordinates.\n')
