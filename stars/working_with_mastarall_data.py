@@ -1,137 +1,125 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 19 23:28:12 2021
+Created on Tue May 25 08:49:25 2021
 
 @author: astrophysics and python
 """
 
-# libraries
+import os
 import warnings
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import seaborn as sns
 from astropy.io import fits
-from matplotlib.colors import LogNorm
 
-from mastarall_functions import statistics, make_hist_kde, t_eff, log_g, big_plot
+import mastar_goodspec_functions as mgf
+import mastarall_functions as maf
 
 warnings.filterwarnings('ignore')
 
-# loading the fits file
-mastar_all = fits.open('mastarall-v2_4_3-v1_0_2.fits')[1]
+solar_radius, solar_mass, solar_luminosity, solar_temperature, solar_g = 695700000, 1.9884E30, 3.828E26, 5800, 274
 
-# loading the required fields
-manga_id = mastar_all.data['MANGAID']
-source_name = mastar_all.data['INPUT_SOURCE']
-log_surface_gravity = mastar_all.data['INPUT_LOGG']
-effective_temperature = mastar_all.data['INPUT_TEFF']
+T_label, g_label, M_label = 'Temperature [K]', 'Surface gravity ' + r'[m/s$^2$]', 'Mass [kg]'
+R_label, L_label = 'Radius [m]', 'Luminosity [J/s]'
 
-# changing the fields into data frame
-mastar_df = pd.DataFrame([manga_id, effective_temperature, log_surface_gravity, source_name]).T
-mastar_df.columns = ['manga_id', 'effective_temperature', 'log_surface_gravity', 'source_name']
+mastarall = fits.open('mastarall-v2_4_3-v1_0_2.fits')[1]
+mastargood = fits.open('mastar-goodspec-v2_4_3-v1_0_2.fits')[1]
 
-# creating a filter with effective_temperature > 0 and log_surface_gravity > 0
-_mastar_df = mastar_df[(mastar_df['effective_temperature'] > 0) & (mastar_df['log_surface_gravity'] > 0)]
-# drop the index and replace it with new index
-_mastar_df.reset_index(drop=True, inplace=True)
+mastarall_manga_id = mastarall.data['MANGAID']
+log_surface_gravity = mastarall.data['INPUT_LOGG']
+effective_temperature = mastarall.data['INPUT_TEFF']
 
-# forcefully change the python data series type to numeric
-# the filterwarnings('ignore') command is to remove the warnings that follow these commands
-_mastar_df['effective_temperature'] = pd.to_numeric(_mastar_df['effective_temperature'])
-_mastar_df['log_surface_gravity'] = pd.to_numeric(_mastar_df['log_surface_gravity'])
+_temp_df = pd.DataFrame([mastarall_manga_id, effective_temperature, log_surface_gravity]).T
+_temp_df.columns = ['manga_id', 'effective_temperature', 'log_surface_gravity']
 
-##############################################
-# working on the data
-##############################################
+mastarall_df = _temp_df[(_temp_df['effective_temperature'] > 0) & (_temp_df['log_surface_gravity'] > 0)]
+mastarall_df.reset_index(drop=True, inplace=True)
 
-##############################################
-# effective temperature
-##############################################
+mastarall_df['effective_temperature'] = pd.to_numeric(mastarall_df['effective_temperature'])
+mastarall_df['log_surface_gravity'] = pd.to_numeric(mastarall_df['log_surface_gravity'])
 
-# get the statistics
-print('Statistics of effective temperature in the MaStar catalog\n')
-statistics(_mastar_df['effective_temperature'])
+mastargood_manga_id = mastargood.data['MANGAID']
+wave = mastargood.data['WAVE']
+flux = mastargood.data['FLUX']
 
-# making a histogram and KDE plot
+mastargood_df = pd.DataFrame([mastargood_manga_id, wave, flux]).T
+mastargood_df.columns = ['manga_id', 'wavelength', 'flux']
+
+# removing the duplicate values
+# taken from https://www.kite.com/python/answers/how-to-select-unique-pandas-dataframe-rows-in-python
+mastargood_df = mastargood_df.drop_duplicates(subset=['manga_id']).reset_index(drop=True)
+
+# getting common manga_id from both dataframes
+# taken form https://stackoverflow.com/a/30535957
+merged_df = pd.merge(mastarall_df, mastargood_df, how='inner', on=['manga_id'])
+
+current_working_directory = os.getcwd()
+
+image_folder = [f for f in os.listdir(os.curdir) if os.path.isdir(f) and f.startswith('mastargood')][0]
+
+os.chdir(image_folder)
+
+plots_req = list(range(0, 2306))
+
+mgf.plotting_spectrum(plotting_device=plt, data_frame=merged_df, num_plots=plots_req)
+
+os.chdir(current_working_directory)
+
+par_list = np.array(mgf.get_stellar_parameters(data_frame=merged_df, num_plots=plots_req))
+
+parameter_df = pd.DataFrame(par_list)
+parameter_df.columns = ['temperature', 'g', 'mass', 'radius', 'luminosity']
+
+for i in list(parameter_df.keys()):
+    print(f'\n------------\n{i.capitalize()}\n------------')
+    maf.statistics(parameter_df[i])
+    print('\n')
+
 plt.figure()
-min_x_teff, max_x_teff = make_hist_kde(_mastar_df['effective_temperature'], 64)
-
-# making a displot
-sns.displot(data=_mastar_df[['effective_temperature', 'source_name']], x='effective_temperature', hue='source_name',
-            multiple='fill')
-t_eff(pos='x')
-
-# making a boxplot
-plt.figure(figsize=(10, 5))
-pd.plotting.boxplot(data=_mastar_df, column='effective_temperature', vert=False)
-t_eff('x')
+_ = plt.hist(np.log(parameter_df['temperature'] / solar_temperature), bins=32)
+plt.ylabel('Number of stars')
+plt.xlabel('log(T/' + r'T$_0$)')
 plt.tight_layout()
-
-# separating the boxplots based on the source_name values
-pd.plotting.boxplot(data=_mastar_df, column='effective_temperature', by='source_name', vert=False, figsize=(10, 5))
-t_eff('x')
-plt.suptitle('')
-plt.title('Boxplot grouped by source_name')
-plt.tight_layout()
-
-# separating the histogram and KDE plots based on the source_name values
-big_plot(_mastar_df, 'effective_temperature', [min_x_teff, max_x_teff])
-
-##############################################
-# log surface gravity
-##############################################
-
-# get the statistics
-print('Statistics of log surface gravity in the MaStar catalog\n')
-statistics(_mastar_df['log_surface_gravity'])
-
-# making a histogram and KDE plot
 plt.figure()
-min_x_logg, max_x_logg = make_hist_kde(_mastar_df['log_surface_gravity'], 64)
-
-# making a displot
-sns.displot(data=_mastar_df[['log_surface_gravity', 'source_name']], x='log_surface_gravity', hue='source_name', multiple='fill')
-log_g(pos='x')
-
-# making a boxplot
-plt.figure(figsize=(10, 5))
-pd.plotting.boxplot(data=_mastar_df, column='log_surface_gravity', vert=False)
-log_g('x')
+_ = plt.hist(np.log(parameter_df['g'] / solar_g), bins=32)
+plt.ylabel('Number of stars')
+plt.xlabel('log(g/' + r'g$_0$)')
 plt.tight_layout()
-
-# separating the boxplots based on the source_name values
-pd.plotting.boxplot(data=_mastar_df, column='log_surface_gravity', by='source_name', vert=False, figsize=(10, 5))
-log_g('x')
-plt.suptitle('')
-plt.title('Boxplot grouped by source_name')
-plt.tight_layout()
-
-# separating the histogram and KDE plots based on the source_name values
-big_plot(_mastar_df, 'log_surface_gravity', [min_x_logg, max_x_logg])
-
-##############################################
-# effective temperature vs log surface gravity
-##############################################
-
-# 2D histogram
-fig, ax = plt.subplots()
-h = ax.hist2d(_mastar_df['effective_temperature'], _mastar_df['log_surface_gravity'], bins=128, norm=LogNorm())
-ax.invert_xaxis()
-fig.colorbar(h[3], ax=ax)
-t_eff('x')
-log_g('y')
-plt.tight_layout()
-
-# scatter plot
 plt.figure()
-sns.scatterplot(x='effective_temperature', y='log_surface_gravity', hue='source_name', data=_mastar_df)
-plt.gca().invert_xaxis()
+_ = plt.hist(np.log(parameter_df['mass'] / solar_mass), bins=32)
+plt.ylabel('Number of stars')
+plt.xlabel('log(M/' + r'M$_0$)')
+plt.tight_layout()
+plt.figure()
+_ = plt.hist(np.log(parameter_df['radius'] / solar_radius), bins=32)
+plt.ylabel('Number of stars')
+plt.xlabel('log(R/' + r'R$_0$)')
+plt.tight_layout()
+plt.figure()
+_ = plt.hist(np.log(parameter_df['luminosity'] / solar_luminosity), bins=32)
+plt.ylabel('Number of stars')
+plt.xlabel('log(L/' + r'L$_0$)')
 plt.tight_layout()
 
-# pair-plot
-f = sns.pairplot(data=_mastar_df, hue='source_name', corner=True)
-f.fig.set_figwidth(13)
-f.fig.set_figheight(8)
-plt.show()
+mgf.two_dimensional_plots(data_frame=parameter_df, x_val='temperature', y_val='g', x_lab=T_label, y_lab=g_label,
+                          x_log=False, y_log=True)
+
+mgf.two_dimensional_plots(parameter_df, 'temperature', 'mass', T_label, M_label, False, True)
+
+mgf.two_dimensional_plots(parameter_df, 'temperature', 'radius', T_label, R_label, False, True)
+
+mgf.two_dimensional_plots(parameter_df, 'temperature', 'luminosity', T_label, L_label, False, True)
+
+mgf.two_dimensional_plots(parameter_df, 'g', 'mass', g_label, M_label, False, True)
+
+mgf.two_dimensional_plots(parameter_df, 'g', 'radius', g_label, R_label, False, False)
+
+mgf.two_dimensional_plots(parameter_df, 'g', 'luminosity', g_label, L_label, False, True)
+
+mgf.two_dimensional_plots(parameter_df, 'luminosity', 'mass', L_label, M_label, True, True)
+
+mgf.two_dimensional_plots(parameter_df, 'luminosity', 'radius', L_label, R_label, True, True)
+
+mgf.two_dimensional_plots(parameter_df, 'mass', 'radius', M_label, R_label, True, True)
