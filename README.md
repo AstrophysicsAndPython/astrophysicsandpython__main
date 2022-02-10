@@ -1,3 +1,4 @@
-# AstrophysicsAndPython-1
+# astrophysicsandpython
 
-Repository # 1 for astrophysicsandpython.wordpress.com
+This project will be related to the work I will do on https://astrophysicsandpython.com
+
