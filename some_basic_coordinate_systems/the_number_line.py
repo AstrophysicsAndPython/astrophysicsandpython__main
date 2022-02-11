@@ -62,11 +62,7 @@ class NumberLine:
             if direction not in ['positive', 'negative']:
                 raise eb.DirectionIsNotPosNeg
 
-            if direction == 'negative':
-                obj_position = self.starting_position - self.magnitude
-
-            else:
-                obj_position = self.starting_position + self.magnitude
+            obj_position = self.starting_position - self.magnitude if direction == 'negative' else self.starting_position + self.magnitude
 
             print(f'The starting position of the object is {self.starting_position}.\n'
                   f'With a magnitude of {self.magnitude} and a {direction} direction, the current position is {obj_position}.')
