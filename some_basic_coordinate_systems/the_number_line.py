@@ -1,87 +1,83 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Wed Mar 24 18:19:25 2021
-
-@author: noonu
 """
 
 import errors.error_base as eb
 import errors.error_messages as em
 
 
-def number_line_with_direction(magnitude: int, starting_position: int = 0) -> int:
-    try:
+class NumberLine:
 
-        if type(magnitude) != int:
-            raise eb.IntNotPassed
+    def __init__(self, magnitude: int, starting_position: int = 0):
+        self.magnitude = magnitude
+        self.starting_position = starting_position
 
-        obj_position = starting_position + magnitude
+    def number_line_with_direction(self):
+        try:
 
-        print('The starting position of the object is {}.\n'
-              'With a magnitude of {}, the final position of the object '
-              'is {}.'.format(starting_position, magnitude, obj_position))
+            if type(self.magnitude) != int:
+                raise eb.IntNotPassed
 
-        return obj_position
+            obj_position = self.starting_position + self.magnitude
 
-    except eb.IntNotPassed:
-        em.IntNotPassed()
+            print(f'The starting position of the object is {self.starting_position}.\n With a magnitude of {self.magnitude}, the final position of the object is {obj_position}.')
 
+            return obj_position
 
-def number_line_no_direction(magnitude: int, starting_position: int = 0) -> [int, int]:
-    try:
+        except eb.IntNotPassed:
+            em.IntNotPassed()
 
-        if type(magnitude) != int:
-            raise eb.IntNotPassed
+    def number_line_no_direction(self):
+        try:
 
-        if magnitude < 0:
-            raise eb.MagnitudeIsLessThanZero
+            if type(self.magnitude) != int:
+                raise eb.IntNotPassed
 
-        obj_position_positive = starting_position + magnitude
-        obj_position_negative = starting_position - magnitude
+            if self.magnitude < 0:
+                raise eb.MagnitudeIsLessThanZero
 
-        print('The starting position is {}.\n'
-              'With no direction specified, the object can have either'
-              '{} or {} position.'.format(starting_position, obj_position_negative, obj_position_positive))
+            obj_position_positive = self.starting_position + self.magnitude
+            obj_position_negative = self.starting_position - self.magnitude
 
-        return [obj_position_positive, obj_position_negative]
+            print(f'The starting position is {self.starting_position}.\n'
+                  f'With no direction specified, the object can have either {obj_position_negative} or {obj_position_positive} position.')
 
-    except eb.IntNotPassed:
-        em.IntNotPassed()
+            return [obj_position_positive, obj_position_negative]
 
-    except eb.MagnitudeIsLessThanZero:
-        em.MagnitudeIsLessThanZero()
+        except eb.IntNotPassed:
+            em.IntNotPassed()
 
+        except eb.MagnitudeIsLessThanZero:
+            em.MagnitudeIsLessThanZero()
 
-def number_line_separate_direction(magnitude: int, direction: str, starting_position: int = 0) -> int:
-    try:
+    def number_line_separate_direction(self, direction: str):
+        try:
 
-        if type(magnitude) != int:
-            raise eb.IntNotPassed
+            if type(self.magnitude) != int:
+                raise eb.IntNotPassed
 
-        if magnitude < 0:
-            raise eb.MagnitudeIsLessThanZero
+            if self.magnitude < 0:
+                raise eb.MagnitudeIsLessThanZero
 
-        if direction not in ['positive', 'negative']:
-            raise eb.DirectionIsNotPosNeg
+            if direction not in ['positive', 'negative']:
+                raise eb.DirectionIsNotPosNeg
 
-        if direction == 'negative':
-            obj_position = starting_position - magnitude
+            if direction == 'negative':
+                obj_position = self.starting_position - self.magnitude
 
-        else:
-            obj_position = starting_position + magnitude
+            else:
+                obj_position = self.starting_position + self.magnitude
 
-        print('The starting position of the object is {}.\n'
-              'With a magnitude of {} and a {} direction, the current position is'
-              ' {}.'.format(starting_position, magnitude, direction, obj_position))
+            print(f'The starting position of the object is {self.starting_position}.\n'
+                  f'With a magnitude of {self.magnitude} and a {direction} direction, the current position is {obj_position}.')
 
-        return obj_position
+            return obj_position
 
-    except eb.IntNotPassed:
-        em.IntNotPassed()
+        except eb.IntNotPassed:
+            em.IntNotPassed()
 
-    except eb.MagnitudeIsLessThanZero:
-        em.MagnitudeIsLessThanZero()
+        except eb.MagnitudeIsLessThanZero:
+            em.MagnitudeIsLessThanZero()
 
-    except eb.DirectionIsNotPosNeg:
-        em.DirectionIsNotPosNeg()
+        except eb.DirectionIsNotPosNeg:
+            em.DirectionIsNotPosNeg()
