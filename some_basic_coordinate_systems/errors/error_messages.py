@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Wed Mar 24 18:46:09 2021
-
-@author: noonu
 """
 
 
@@ -40,3 +36,7 @@ def AssumeX():
 
 def AssumeXY():
     print('Only two coordinates give, assuming the values to be x and y coordinates.\n')
+
+
+def HmsIsNegative():
+    print('HMS cannot be negative.')

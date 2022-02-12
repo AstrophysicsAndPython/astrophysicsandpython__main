@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Wed Mar 24 18:44:02 2021
-
-@author: noonu
 """
 
 
@@ -32,4 +28,8 @@ class ExtraParameterGiven(BaseErrorClass):
 
 
 class EmptyList(BaseErrorClass):
+    pass
+
+
+class HmsIsNegative(BaseErrorClass):
     pass
