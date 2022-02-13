@@ -2,20 +2,22 @@
 Created on Wed Mar 24 18:19:25 2021
 """
 
+from typing import List
+
 import errors.error_base as eb
 import errors.error_messages as em
 
 
 class NumberLine:
 
-    def __init__(self, magnitude: int, starting_position: int = 0):
+    def __init__(self, magnitude: float, starting_position: float = 0):
         self.magnitude = magnitude
         self.starting_position = starting_position
 
-    def number_line_with_direction(self):
+    def number_line_with_direction(self) -> float:
         try:
 
-            if type(self.magnitude) != int:
+            if not isinstance(self.magnitude, float):
                 raise eb.IntNotPassed
 
             obj_position = self.starting_position + self.magnitude
@@ -27,10 +29,10 @@ class NumberLine:
         except eb.IntNotPassed:
             em.IntNotPassed()
 
-    def number_line_no_direction(self):
+    def number_line_no_direction(self) -> List[float, float]:
         try:
 
-            if type(self.magnitude) != int:
+            if not isinstance(self.magnitude, float):
                 raise eb.IntNotPassed
 
             if self.magnitude < 0:
@@ -50,10 +52,10 @@ class NumberLine:
         except eb.MagnitudeIsLessThanZero:
             em.MagnitudeIsLessThanZero()
 
-    def number_line_separate_direction(self, direction: str):
+    def number_line_separate_direction(self, direction: str) -> float:
         try:
 
-            if type(self.magnitude) != int:
+            if not isinstance(self.magnitude, float):
                 raise eb.IntNotPassed
 
             if self.magnitude < 0:
