@@ -1,62 +1,86 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Thu Apr  1 03:05:09 2021
-
-@author: noonu
 """
+
+from typing import List
 
 import numpy as np
 
+ListOfFloats = List[float, float, float]
 
-def distance_formula_spherical(initial_coordinates, final_coordinates=None, deg_rad=None):
+
+def distance_formula_spherical(initial_coordinates: ListOfFloats, final_coordinates: ListOfFloats = None, deg_rad: str = None) -> float:
     """
-
     Calculates the distance between two given points in spherical coordinate system
 
-    :param initial_coordinates: reference coordinates of the point
-    :param final_coordinates: final coordinates of the point to which the distance is to be calculated
-    :param deg_rad: whether the specified theta and phi arguments are in degree or radians
-    :return: distance between two points in spherical coordinates
+    Parameters
+    ----------
+    initial_coordinates:
+        Reference coordinates of the point
+    final_coordinates:
+        Final coordinates of the point to which the distance is to be calculated
+    deg_rad:
+        Whether the specified theta and phi arguments are in degree or radians
+
+    Returns
+    ----------
+    float:
+        Distance between two points in spherical coordinates
     """
 
     r1, theta1, phi1 = initial_coordinates
     r2, theta2, phi2 = final_coordinates
 
-    if deg_rad == 'deg':
-        theta1, phi1, theta2, phi2 = np.radians(theta1), np.radians(phi1), np.radians(theta2), np.radians(phi2)
+    theta1, phi1, theta2, phi2 = np.radian([theta1, phi1, theta2, phi2]) if deg_rad == 'deg' else [theta2, phi1, theta2, phi2]
 
-    _p1, _p2 = pow(r1, 2) + pow(r2, 2), - 2 * r1 * r2 * (np.sin(theta1) * np.sin(theta2) * np.cos(phi1 - phi2))
-    _p3 = np.cos(theta1) * np.cos(theta2)
+    _frac1 = pow(r1, 2) + pow(r2, 2)
+    _frac2 = - 2 * r1 * r2 * (np.sin(theta1) * np.sin(theta2) * np.cos(phi1 - phi2))
+    _frac3 = np.cos(theta1) * np.cos(theta2)
 
-    return round(pow(_p1 + _p2 + _p3, 0.5), 4)
+    return pow(_frac1 + _frac2 + _frac3, 0.5)
 
 
-def spherical_3d(r_theta_phi_change, starting_point=None, deg_rad=None):
+def spherical_3d(change_in_coordinates: ListOfFloats, starting_point: ListOfFloats = None, deg_rad: str = None):
     """
-
     Calculates new location of the point in spherical coordinates system, given a translation of the object
 
-    :param r_theta_phi_change: Change in the coordinates of the object given in a list in <r, theta, phi> order
-    :param starting_point: Starting coordinates of the point in spherical coordinates
-    :param deg_rad: whether the specified theta and phi arguments are in degree or radians
-    :return: New coordinates for the point in spherical coordinate system
+    Parameters
+    ----------
+    change_in_coordinates:
+        Change in the coordinates of the object given in a list in <r, theta, phi> order
+    starting_point:
+        Starting coordinates of the point in spherical coordinates.
+    deg_rad:
+        Whether the specified theta and phi arguments are in degree or radians
+
+    Returns
+    ----------
+    float:
+        New coordinates for the point in spherical coordinate system
     """
     try:
-        if starting_point is None:
-            starting_point = [0, 0, 0]
-        r, theta, phi = r_theta_phi_change
-        if deg_rad == 'deg':
-            theta, phi = np.radians(theta), np.radians(phi)
 
-        r_theta_phi_change = [r, theta, phi]
+        r, theta, phi = change_in_coordinates
 
-        new_r, new_theta, new_phi = [sum(x) for x in zip(starting_point, r_theta_phi_change)]
+        starting_point = [0, 0, 0] if starting_point is None else starting_point
+
+        theta, phi = np.radians([theta, phi]) if deg_rad == 'deg' else [theta, phi]
+
+        change_in_coordinates = [r, theta, phi]
+
+        new_r, new_theta, new_phi = [sum(x) for x in zip(starting_point, change_in_coordinates)]
 
         if 360 > np.degrees(new_theta) > 180:
             new_theta = np.radians(180 - (np.degrees(new_theta) - 180))
         elif -180 < np.degrees(new_theta) < 0:
             new_theta = np.abs(new_theta)
+
+        # have to check this out
+        #
+        # (direction_phi, direction_theta) = [('N', 'W') if 0 < np.degrees(phi) < 90 else
+        #                                     ('N', 'E') if 90 < np.degrees(phi) < 80 else
+        #                                     ('S', 'E') if 0 > np.degrees(phi) > -90 else
+        #                                     ('S', 'W') if -90 > np.degrees(phi) >= 180 else None][0]
 
         if 0 < np.degrees(phi) < 90:
             direction_phi = 'N'
