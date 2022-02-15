@@ -2,14 +2,16 @@
 Created on Thu Apr  1 03:05:09 2021
 """
 
-from typing import List
+from typing import Tuple
 
 import numpy as np
 
-ListOfFloats = List[float, float, float]
+import utilities
+
+TFloats = Tuple[float, float, float]
 
 
-def distance_formula_spherical(initial_coordinates: ListOfFloats, final_coordinates: ListOfFloats = None, deg_rad: str = None) -> float:
+def distance_formula_spherical(initial_coordinates: TFloats, final_coordinates: TFloats = None, deg_rad: str = 'rad') -> float:
     """
     Calculates the distance between two given points in spherical coordinate system
 
@@ -40,9 +42,9 @@ def distance_formula_spherical(initial_coordinates: ListOfFloats, final_coordina
     return pow(_frac1 + _frac2 + _frac3, 0.5)
 
 
-def spherical_3d(change_in_coordinates: ListOfFloats, starting_point: ListOfFloats = None, deg_rad: str = None):
+def translation_in_spherical_coordinates(change_in_coordinates: TFloats, starting_point: TFloats = (0, 0, 0), deg_rad: str = 'rad'):
     """
-    Calculates new location of the point in spherical coordinates system, given a translation of the object
+    Calculates new coordinates of the point in spherical system given the translation in the object's coordinates.
 
     Parameters
     ----------
@@ -58,53 +60,26 @@ def spherical_3d(change_in_coordinates: ListOfFloats, starting_point: ListOfFloa
     float:
         New coordinates for the point in spherical coordinate system
     """
-    try:
 
-        r, theta, phi = change_in_coordinates
+    # make sure the sum of each individual argument is > 0
+    utilities.ensure_positive([starting_point, change_in_coordinates])
 
-        starting_point = [0, 0, 0] if starting_point is None else starting_point
+    # the starting_point is taken in radians
+    r1, theta1, phi1 = starting_point
+    r2, theta2, phi2 = change_in_coordinates
 
-        theta, phi = np.radians([theta, phi]) if deg_rad == 'deg' else [theta, phi]
+    # convert theta and phi to radians if not already
+    theta1, phi1, theta2, phi2 = np.radians([theta1, phi1, theta2, phi2]) if deg_rad == 'deg' else [theta1, phi1, theta2, phi2]
 
-        change_in_coordinates = [r, theta, phi]
+    # make sure that theta does not exceed 360
+    _theta1, _theta2 = utilities.ensure_theta([theta1, theta2])
 
-        new_r, new_theta, new_phi = [sum(x) for x in zip(starting_point, change_in_coordinates)]
+    # make sure that phi does not exceed 180
+    _phi1, _phi2 = utilities.ensure_phi([phi1, phi2])
 
-        if 360 > np.degrees(new_theta) > 180:
-            new_theta = np.radians(180 - (np.degrees(new_theta) - 180))
-        elif -180 < np.degrees(new_theta) < 0:
-            new_theta = np.abs(new_theta)
+    _changed = [sum(x) for x in zip((r1, theta1, phi1), (r2, theta2, phi2))]
 
-        # have to check this out
-        #
-        # (direction_phi, direction_theta) = [('N', 'W') if 0 < np.degrees(phi) < 90 else
-        #                                     ('N', 'E') if 90 < np.degrees(phi) < 80 else
-        #                                     ('S', 'E') if 0 > np.degrees(phi) > -90 else
-        #                                     ('S', 'W') if -90 > np.degrees(phi) >= 180 else None][0]
+    print(f'The starting coordinates of the point were {r1}, {np.degrees(_theta1)}, {np.degrees(_phi1)} in degrees.\n'
+          f'The new coordinates of the point are {_changed[0]}, {np.degrees(_changed[1])}, {np.degrees(_changed[2])}')
 
-        if 0 < np.degrees(phi) < 90:
-            direction_phi = 'N'
-            direction_theta = 'W'
-        elif 90 < np.degrees(phi) < 180:
-            new_phi = np.radians(90 - (np.degrees(phi) - 90))
-            direction_phi = 'N'
-            direction_theta = 'W'
-        elif 0 > np.degrees(phi) > -90:
-            new_phi = np.abs(new_phi)
-            direction_phi = 'S'
-            direction_theta = 'E'
-        elif -90 > np.degrees(phi) >= -180:
-            print('im here')
-            new_phi = np.radians(90 - (np.abs(np.degrees(phi)) - 90))
-            direction_phi = 'S'
-            direction_theta = 'W'
-        else:
-            print('Invalid input')
-
-        print(f'The starting coordinates of the point are {starting_point}> in degrees.\n'
-              f'The new coordinates of the point are <{new_r}, {np.degrees(new_theta)} {direction_theta}, '
-              f'{np.degrees(new_phi)} {direction_phi}>')
-
-        return round(new_r, 4), round(new_theta, 4), round(new_phi, 4)
-    except UnboundLocalError:
-        pass
+    return _changed

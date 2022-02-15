@@ -2,8 +2,12 @@
 Created on Thu Apr  1 01:31:56 2021
 """
 
-from ..errors.error_base import EmptyList
-from ..errors.error_messages import AssumeX, AssumeXY
+from typing import Union
+
+import numpy as np
+
+from errors.error_base import EmptyList, NegativeValueFound
+from errors.error_messages import AssumeX, AssumeXY
 
 
 def check_list_len_2d(list_to_check):
@@ -35,3 +39,19 @@ def check_list_len_3d(list_to_check):
         return _list_to_check
     except EmptyList:
         EmptyList(3)
+
+
+def ensure_theta(theta: Union[list, float]):
+    # in part taken from https://stackoverflow.com/a/50457453
+    return [x % (2 * np.pi) for x in theta] if isinstance(theta, list) else theta % (2 * np.pi)
+
+
+def ensure_phi(phi: Union[list, float]):
+    # in part taken from https://stackoverflow.com/a/50457453
+    return [x % np.pi for x in phi] if isinstance(phi, list) else phi % np.pi
+
+
+def ensure_positive(args):
+    _sum = np.sum(args, axis=0)
+    if any(x < 0 for x in _sum):
+        raise NegativeValueFound('Found negative sum, these parameters can not have a negative sum.')

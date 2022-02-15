@@ -8,7 +8,7 @@ Created on Thu Mar 24 09:06:45 2021
 
 import errors.error_base as eb
 import errors.error_messages as em
-from misc.misc import check_list_len_3d
+from some_basic_coordinate_systems.utilities import check_list_len_3d
 
 
 def distance_formula_3d(initial_coordinates, final_coordinates):

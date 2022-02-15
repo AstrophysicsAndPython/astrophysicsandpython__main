@@ -31,12 +31,16 @@ def EmptyList(num=None):
 
 
 def AssumeX():
-    print('Only one coordinate given, assuming the value to be x coordinate.\n')
+    print('Only one coordinate given, assuming the value to be x coordinate.')
 
 
 def AssumeXY():
-    print('Only two coordinates give, assuming the values to be x and y coordinates.\n')
+    print('Only two coordinates give, assuming the values to be x and y coordinates.')
 
 
 def HmsIsNegative():
     print('HMS cannot be negative.')
+
+
+def NegativeValueFound():
+    print(f'Raised NegativeValueFound error: Found negative sum, these parameters can not have a negative sum.')

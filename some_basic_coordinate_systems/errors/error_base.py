@@ -33,3 +33,7 @@ class EmptyList(BaseErrorClass):
 
 class HmsIsNegative(BaseErrorClass):
     pass
+
+
+class NegativeValueFound(BaseErrorClass):
+    pass
