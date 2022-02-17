@@ -7,7 +7,7 @@ class BaseErrorClass(Exception):
     pass
 
 
-class IntNotPassed(BaseErrorClass):
+class FloatNotPassed(BaseErrorClass):
     pass
 
 

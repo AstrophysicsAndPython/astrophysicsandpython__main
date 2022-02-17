@@ -3,7 +3,7 @@ Created on Wed Mar 24 18:46:09 2021
 """
 
 
-def IntNotPassed():
+def FloatNotPassed():
     print('Parameter type should be int.')
 
 
