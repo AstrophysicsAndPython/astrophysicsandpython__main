@@ -2,37 +2,34 @@
 Created on Thu Apr  1 01:12:40 2021
 """
 
-from typing import Tuple
-
 import numpy as np
 
 
-def spherical_to_cartesian(spherical_coordinates: Tuple[float, float, float], deg_rad: str = 'rad'):
+def spherical_to_cartesian(spherical_coordinates, deg_rad: str = 'rad'):
     """
     Converts spherical coordinates to Cartesian/rectangular coordinates.
 
     Parameters
     ----------
-    spherical_coordinates : Tuple[float, float, float]
+    spherical_coordinates:
         A tuple containing spherical coordinates.
-    deg_rad : str, optional
+    deg_rad: str, optional
         Indication whether the input coordinates are in degrees or radians. The default is 'rad'.
 
     Returns
     -------
-    x : float
-        x-coordinate of spherical coordinates.
-    y : float
-        y-coordinate in spherical coordinates.
-    z : float
-        z-coordinate in spherical coordinates.
+    list:
+        Cartesian coordinates of the input spherical coordinates.
 
     """
 
-    cs_ = np.deg2rad(spherical_coordinates) if deg_rad == 'deg' else spherical_coordinates
+    # convert from degrees to radians (only theta and phi parameters)
+    cs_ = np.append(spherical_coordinates[0], np.deg2rad(spherical_coordinates[1:])) if deg_rad == 'deg' else np.array(spherical_coordinates)
 
-    rho, theta, phi = cs_
+    # reinitialize the coordinates
+    rho, theta, phi = cs_.flatten()
 
+    # calculate the Cartesian coordinates
     x = rho * np.sin(phi) * np.cos(theta)
     y = rho * np.sin(phi) * np.sin(theta)
     z = rho * np.cos(phi)
@@ -40,33 +37,31 @@ def spherical_to_cartesian(spherical_coordinates: Tuple[float, float, float], de
     return x, y, z
 
 
-def cartesian_to_spherical(rectangular_coordinates, deg_rad='rad'):
+def cartesian_to_spherical(rectangular_coordinates):
     """
-
+    Converts Cartesian coordinates to spherical coordinates.
 
     Parameters
     ----------
-    rectangular_coordinates : TYPE
-        DESCRIPTION.
-    deg_rad : TYPE, optional
-        DESCRIPTION. The default is 'rad'.
+    rectangular_coordinates:
+        A list of coordinates of the point in Cartesian space.
 
     Returns
     -------
-    rho : TYPE
-        DESCRIPTION.
-    theta : TYPE
-        DESCRIPTION.
-    phi : TYPE
-        DESCRIPTION.
-
+    list:
+        Spherical coordinates of the input Cartesian coordinates.
     """
-    cs_ = np.deg2rad(rectangular_coordinates) if deg_rad == 'deg' else rectangular_coordinates
 
-    x, y, z = cs_
+    # initialize the coordinates
+    x, y, z = rectangular_coordinates
 
+    # calculate rho
     rho = np.sqrt(x**2 + y**2 + z**2)
+
+    # calculate theta, the reason for using arctan2 is that the range of theta parameter is -180 < theta < 180.
     theta = np.arctan2(y, x)
+
+    # calculate phi
     phi = np.arccos(z / rho)
 
     return rho, theta, phi

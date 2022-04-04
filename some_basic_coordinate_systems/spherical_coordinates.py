@@ -2,19 +2,14 @@
 Created on Thu Apr  1 03:05:09 2021
 """
 
-from typing import Tuple
-
 import numpy as np
 
 import utilities
 
-TFloats = Tuple[float, float, float]
 
-
-def distance_formula(initial_coordinates: TFloats, final_coordinates: TFloats = None, deg_rad: str = 'rad') -> float:
+def distance_formula(initial_coordinates, final_coordinates=None, deg_rad: str = 'rad'):
     """
     Calculates the distance between two given points in spherical coordinate system
-
     Parameters
     ----------
     initial_coordinates:
@@ -23,7 +18,6 @@ def distance_formula(initial_coordinates: TFloats, final_coordinates: TFloats = 
         Final coordinates of the point to which the distance is to be calculated
     deg_rad:
         Whether the specified theta and phi arguments are in degree or radians
-
     Returns
     ----------
     float:
@@ -33,12 +27,20 @@ def distance_formula(initial_coordinates: TFloats, final_coordinates: TFloats = 
     r1, theta1, phi1 = initial_coordinates
     r2, theta2, phi2 = final_coordinates
 
-    theta1, phi1, theta2, phi2 = np.radian([theta1, phi1, theta2, phi2]) if deg_rad == 'deg' else [theta2, phi1, theta2, phi2]
+    theta1, phi1 = np.radians([theta1, phi1]) if deg_rad == 'deg' else theta2, phi1
+    theta2, phi2 = np.radians([theta2, phi2]) if deg_rad == 'deg' else theta2, phi2
 
-    return np.sqrt(r1**2 + r2**2 - 2 * r1 * r2 * (np.sin(theta1) * np.sin(theta2) * np.cos(phi1 - phi2) + np.cos(theta1) * np.cos(theta2)))
+    p1 = r1**2 + r2**2
+
+    _comp1 = np.sin(theta1) * np.sin(theta2) * np.cos(phi1 - phi2)
+    _comp2 = np.cos(theta1) * np.cos(theta2)
+
+    p2 = 2 * r1 * r2 * (_comp1 + _comp2)
+
+    return np.sqrt(p1 - p2)
 
 
-def translation_in_coordinates(change_in_coordinates: TFloats, starting_point: TFloats = (0, 0, 0), deg_rad: str = 'rad'):
+def translation_in_coordinates(change_in_coordinates, starting_point=(0, 0, 0), deg_rad: str = 'rad'):
     """
     Calculates new coordinates of the point in spherical system given the translation in the object's coordinates.
 
@@ -65,7 +67,8 @@ def translation_in_coordinates(change_in_coordinates: TFloats, starting_point: T
     r2, theta2, phi2 = change_in_coordinates
 
     # convert theta and phi to radians if not already
-    theta1, phi1, theta2, phi2 = np.radians([theta1, phi1, theta2, phi2]) if deg_rad == 'deg' else [theta1, phi1, theta2, phi2]
+    theta1, phi1 = np.radians([theta1, phi1]) if deg_rad == 'deg' else theta2, phi1
+    theta2, phi2 = np.radians([theta2, phi2]) if deg_rad == 'deg' else theta2, phi2
 
     # make sure that theta does not exceed 360
     _theta1, _theta2 = utilities.ensure_theta([theta1, theta2])
