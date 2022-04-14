@@ -2,9 +2,7 @@
 Created on Wed Mar 24 18:19:25 2021
 """
 
-from typing import List
-
-import errors.error_base as eb
+import errors.errors__the_number_line as err
 
 
 class NumberLine:
@@ -22,12 +20,12 @@ class NumberLine:
         self.magnitude = magnitude
         self.starting_position = starting_position
 
-    def magnitude_without_direction(self) -> List[float, float]:
+    def magnitude_without_direction(self):
         if not isinstance(self.magnitude, float):
-            raise eb.FloatNotPassed('Parameter type should be of float type.')
+            raise err.FloatNotPassed('Parameter type should be of float type.')
 
         if self.magnitude < 0:
-            raise eb.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
+            raise err.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
 
         obj_position_positive = self.starting_position + self.magnitude
         obj_position_negative = self.starting_position - self.magnitude
@@ -37,25 +35,27 @@ class NumberLine:
 
         return [obj_position_positive, obj_position_negative]
 
-    def magnitude_with_direction(self) -> float:
+    def magnitude_with_direction(self):
         if not isinstance(self.magnitude, float):
-            raise eb.FloatNotPassed('Parameter type should be of float type.')
+            raise err.FloatNotPassed('Parameter type should be of float type.')
 
         obj_position = self.starting_position + self.magnitude
 
-        print(f'The starting position of the object is {self.starting_position}.\n With a magnitude of {self.magnitude}, the final position of the object is {obj_position}.')
+        print(
+            f'The starting position of the object is {self.starting_position}.\n With a magnitude of '
+            f'{self.magnitude}, the final position of the object is {obj_position}.')
 
         return obj_position
 
-    def magnitude_with_separate_direction(self, direction: str) -> float:
+    def magnitude_with_separate_direction(self, direction: str):
         if not isinstance(self.magnitude, float):
-            raise eb.FloatNotPassed('Parameter type should be of float type.')
+            raise err.FloatNotPassed('Parameter type should be of float type.')
 
         if self.magnitude < 0:
-            raise eb.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
+            raise err.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
 
         if direction not in ['positive', 'negative']:
-            raise eb.DirectionIsNotPosNeg('Direction can either be positive or negative only.')
+            raise err.DirectionIsNotPosNeg('Direction can either be positive or negative only.')
 
         obj_position = self.starting_position - self.magnitude if direction == 'negative' else self.starting_position + self.magnitude
 

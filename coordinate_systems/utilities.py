@@ -6,8 +6,8 @@ from typing import Union
 
 import numpy as np
 
-from errors.error_base import EmptyList, NegativeValueFound
 from errors.error_messages import AssumeX, AssumeXY
+from errors.errors__the_number_line import EmptyList, NegativeValueFound
 
 
 def check_list_len_2d(list_to_check):

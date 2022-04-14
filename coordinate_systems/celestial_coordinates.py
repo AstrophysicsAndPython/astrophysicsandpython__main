@@ -4,8 +4,8 @@ Created on Sat Apr 10 15:29:25 2021
 
 import numpy as np
 
-import errors.error_base as eb
 import errors.error_messages as em
+import errors.errors__the_number_line as eb
 
 _ecliptic, _ra_gal, _dec_gal, _long_ncp = np.radians([23.43927944, 192.85948, 27.12825, 122.93192])
 
@@ -153,7 +153,8 @@ def equatorial__horizontal(observer_latitude, declination, right_ascension=None,
 
     latitude, hour_angle, declination = np.radians([latitude, hour_angle, declination])
 
-    zenith_angle = np.arccos(np.sin(latitude) * np.sin(declination) + np.cos(latitude) * np.cos(declination) * np.cos(hour_angle))
+    zenith_angle = np.arccos(
+            np.sin(latitude) * np.sin(declination) + np.cos(latitude) * np.cos(declination) * np.cos(hour_angle))
 
     altitude = zenith_angle__altitude(zenith_angle, deg=False)
 
@@ -176,7 +177,8 @@ def horizontal__equatorial(observer_latitude, altitude, azimuth):
 
     zenith_angle = -zenith_angle if latitude < 0 else zenith_angle
 
-    declination = np.arcsin(np.sin(latitude) * np.cos(zenith_angle) + np.cos(latitude) * np.sin(zenith_angle) * np.cos(azimuth))
+    declination = np.arcsin(
+            np.sin(latitude) * np.cos(zenith_angle) + np.cos(latitude) * np.sin(zenith_angle) * np.cos(azimuth))
 
     _num, _den = (np.cos(zenith_angle) - np.sin(latitude) * np.sin(declination), np.cos(latitude) * np.cos(declination))
 
@@ -209,7 +211,8 @@ def equatorial__ecliptic(right_ascension, declination):
 def ecliptic__equatorial(ecliptic_latitude, ecliptic_longitude):
     ec_latitude, ec_longitude = dms__dd([ecliptic_latitude, ecliptic_longitude])
 
-    dec = np.arcsin(np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(_ecliptic) * np.sin(ec_longitude))
+    dec = np.arcsin(
+            np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(_ecliptic) * np.sin(ec_longitude))
 
     _num, _den = (np.cos(ec_latitude) * np.sin(ec_longitude) * np.cos(_ecliptic) -
                   np.sin(ec_latitude) * np.sin(_ecliptic), np.cos(ec_latitude) * np.cos(ec_longitude))
@@ -230,7 +233,8 @@ def equatorial__galactic(right_ascension, declination):
     ra, dec = hms__dd(right_ascension), dms__dd(declination)
 
     gal_long = np.arctan2(np.cos(dec) * np.sin(ra - _ra_gal),
-                          np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(_dec_gal) * np.cos(ra - _ra_gal)) - _long_ncp
+                          np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(_dec_gal) * np.cos(
+                                  ra - _ra_gal)) - _long_ncp
 
     gal_lat = np.arcsin(np.sin(dec) * np.sin(_dec_gal) + np.cos(dec) * np.cos(_dec_gal) * np.cos(ra - _ra_gal))
 
@@ -242,10 +246,12 @@ def equatorial__galactic(right_ascension, declination):
 def galactic__equatorial(galactic_latitude, galactic_longitude):
     gal_lat, gal_long = dms__dd([galactic_latitude, galactic_longitude])
 
-    dec = np.arcsin(np.sin(gal_lat) * np.sin(_dec_gal) + np.cos(gal_lat) * np.cos(_dec_gal) * np.cos(_long_ncp - gal_long))
+    dec = np.arcsin(
+            np.sin(gal_lat) * np.sin(_dec_gal) + np.cos(gal_lat) * np.cos(_dec_gal) * np.cos(_long_ncp - gal_long))
 
     ra = np.arctan2(np.cos(gal_lat) * np.sin(_long_ncp - gal_long),
-                    np.sin(gal_lat) * np.cos(_dec_gal) - np.cos(gal_lat) * np.sin(_dec_gal) * np.cos(_long_ncp - gal_long)) + _ra_gal
+                    np.sin(gal_lat) * np.cos(_dec_gal) - np.cos(gal_lat) * np.sin(_dec_gal) * np.cos(
+                            _long_ncp - gal_long)) + _ra_gal
 
     ra, dec = np.degrees([ra, dec])
 

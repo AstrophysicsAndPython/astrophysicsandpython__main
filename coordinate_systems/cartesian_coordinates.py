@@ -5,8 +5,8 @@ Created on Thu Mar 24 09:06:45 2021
 
 import numpy as np
 
-import errors.error_base as eb
-from some_basic_coordinate_systems.utilities import check_list_len_3d
+import errors.errors__the_number_line as eb
+from coordinate_systems.utilities import check_list_len_3d
 
 
 def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
