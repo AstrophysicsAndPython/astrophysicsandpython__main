@@ -7,7 +7,8 @@ import numpy as np
 import errors.error_messages as em
 import errors.errors__the_number_line as eb
 
-_ecliptic, _ra_gal, _dec_gal, _long_ncp = np.radians([23.43927944, 192.85948, 27.12825, 122.93192])
+_ecliptic, _ra_gal, _dec_gal, _long_ncp = np.radians(
+        [23.43927944, 192.85948, 27.12825, 122.93192])
 
 
 def altitude__zenith_angle(altitude, deg=True):
@@ -19,7 +20,8 @@ def zenith_angle__altitude(zenith_angle, deg=True):
 
 
 def right_ascension__hour_angle(right_ascension, local_time):
-    _ra = dd__hms(right_ascension) if type(right_ascension) != str else float(right_ascension.split(':')[0])
+    _ra = dd__hms(right_ascension) if type(right_ascension) != str else float(
+            right_ascension.split(':')[0])
     _lt = dd__dms(local_time) if type(local_time) != str else float(local_time.split(':'))
 
     # if type(right_ascension) != str:
@@ -38,8 +40,10 @@ def right_ascension__hour_angle(right_ascension, local_time):
 
 
 def hour_angle__right_ascension(hour_angle, local_time):
-    _ha = dd__hms(hour_angle) if type(hour_angle) != str else float(hour_angle.split(':')[0])
-    _lt = dd__dms(local_time) if type(local_time) != str else float(local_time.split(':')[0])
+    _ha = dd__hms(hour_angle) if type(hour_angle) != str else float(
+            hour_angle.split(':')[0])
+    _lt = dd__dms(local_time) if type(local_time) != str else float(
+            local_time.split(':')[0])
 
     # if type(hour_angle) != str:
     #     hour_angle = dd__hms(hour_angle)
@@ -133,7 +137,8 @@ def dms__dd(dms):
     return out[0] if type(dms) == str or len(dms) == 1 else out
 
 
-def equatorial__horizontal(observer_latitude, declination, right_ascension=None, hour_angle=None, local_time=None):
+def equatorial__horizontal(observer_latitude, declination, right_ascension=None,
+                           hour_angle=None, local_time=None):
     declination, latitude = dms__dd([declination, observer_latitude])
 
     if right_ascension is not None:
@@ -154,7 +159,8 @@ def equatorial__horizontal(observer_latitude, declination, right_ascension=None,
     latitude, hour_angle, declination = np.radians([latitude, hour_angle, declination])
 
     zenith_angle = np.arccos(
-            np.sin(latitude) * np.sin(declination) + np.cos(latitude) * np.cos(declination) * np.cos(hour_angle))
+            np.sin(latitude) * np.sin(declination) + np.cos(latitude) * np.cos(
+                    declination) * np.cos(hour_angle))
 
     altitude = zenith_angle__altitude(zenith_angle, deg=False)
 
@@ -171,20 +177,24 @@ def equatorial__horizontal(observer_latitude, declination, right_ascension=None,
 
 
 def horizontal__equatorial(observer_latitude, altitude, azimuth):
-    altitude, azimuth, latitude = np.radians([dms__dd([altitude, azimuth, observer_latitude])])
+    altitude, azimuth, latitude = np.radians(
+            [dms__dd([altitude, azimuth, observer_latitude])])
 
     zenith_angle = zenith_angle__altitude(altitude)
 
     zenith_angle = -zenith_angle if latitude < 0 else zenith_angle
 
     declination = np.arcsin(
-            np.sin(latitude) * np.cos(zenith_angle) + np.cos(latitude) * np.sin(zenith_angle) * np.cos(azimuth))
+            np.sin(latitude) * np.cos(zenith_angle) + np.cos(latitude) * np.sin(
+                    zenith_angle) * np.cos(azimuth))
 
-    _num, _den = (np.cos(zenith_angle) - np.sin(latitude) * np.sin(declination), np.cos(latitude) * np.cos(declination))
+    _num, _den = (np.cos(zenith_angle) - np.sin(latitude) * np.sin(declination),
+                  np.cos(latitude) * np.cos(declination))
 
     _ha = np.arccos(_num / _den)
 
-    hour_angle = 2 * np.pi - _ha if np.logical_or(latitude > 0 > declination, latitude < 0 < declination) else _ha
+    hour_angle = 2 * np.pi - _ha if np.logical_or(latitude > 0 > declination,
+                                                  latitude < 0 < declination) else _ha
 
     # if (latitude > 0 > declination) or (latitude < 0 < declination):
     #     hour_angle = 2 * np.pi - hour_angle
@@ -197,9 +207,12 @@ def horizontal__equatorial(observer_latitude, altitude, azimuth):
 def equatorial__ecliptic(right_ascension, declination):
     ra, dec = hms__dd(right_ascension), dms__dd(declination)
 
-    ec_latitude = np.arcsin(np.sin(dec) * np.cos(_ecliptic) - np.cos(dec) * np.sin(_ecliptic) * np.sin(ra))
+    ec_latitude = np.arcsin(
+            np.sin(dec) * np.cos(_ecliptic) - np.cos(dec) * np.sin(_ecliptic) * np.sin(
+                    ra))
 
-    _num, _den = (np.sin(ra) * np.cos(_ecliptic) + np.tan(dec) * np.sin(_ecliptic), np.cos(ra))
+    _num, _den = (
+        np.sin(ra) * np.cos(_ecliptic) + np.tan(dec) * np.sin(_ecliptic), np.cos(ra))
 
     ec_longitude = np.arcsin(_num / _den)
 
@@ -212,10 +225,12 @@ def ecliptic__equatorial(ecliptic_latitude, ecliptic_longitude):
     ec_latitude, ec_longitude = dms__dd([ecliptic_latitude, ecliptic_longitude])
 
     dec = np.arcsin(
-            np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(_ecliptic) * np.sin(ec_longitude))
+            np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(
+                    _ecliptic) * np.sin(ec_longitude))
 
     _num, _den = (np.cos(ec_latitude) * np.sin(ec_longitude) * np.cos(_ecliptic) -
-                  np.sin(ec_latitude) * np.sin(_ecliptic), np.cos(ec_latitude) * np.cos(ec_longitude))
+                  np.sin(ec_latitude) * np.sin(_ecliptic),
+                  np.cos(ec_latitude) * np.cos(ec_longitude))
 
     _ra = np.arctan2(_num, _den)
 
@@ -233,10 +248,13 @@ def equatorial__galactic(right_ascension, declination):
     ra, dec = hms__dd(right_ascension), dms__dd(declination)
 
     gal_long = np.arctan2(np.cos(dec) * np.sin(ra - _ra_gal),
-                          np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(_dec_gal) * np.cos(
+                          np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(
+                                  _dec_gal) * np.cos(
                                   ra - _ra_gal)) - _long_ncp
 
-    gal_lat = np.arcsin(np.sin(dec) * np.sin(_dec_gal) + np.cos(dec) * np.cos(_dec_gal) * np.cos(ra - _ra_gal))
+    gal_lat = np.arcsin(
+            np.sin(dec) * np.sin(_dec_gal) + np.cos(dec) * np.cos(_dec_gal) * np.cos(
+                    ra - _ra_gal))
 
     gal_long, gal_lat = np.degrees([gal_long, gal_lat])
 
@@ -247,10 +265,12 @@ def galactic__equatorial(galactic_latitude, galactic_longitude):
     gal_lat, gal_long = dms__dd([galactic_latitude, galactic_longitude])
 
     dec = np.arcsin(
-            np.sin(gal_lat) * np.sin(_dec_gal) + np.cos(gal_lat) * np.cos(_dec_gal) * np.cos(_long_ncp - gal_long))
+            np.sin(gal_lat) * np.sin(_dec_gal) + np.cos(gal_lat) * np.cos(
+                    _dec_gal) * np.cos(_long_ncp - gal_long))
 
     ra = np.arctan2(np.cos(gal_lat) * np.sin(_long_ncp - gal_long),
-                    np.sin(gal_lat) * np.cos(_dec_gal) - np.cos(gal_lat) * np.sin(_dec_gal) * np.cos(
+                    np.sin(gal_lat) * np.cos(_dec_gal) - np.cos(gal_lat) * np.sin(
+                            _dec_gal) * np.cos(
                             _long_ncp - gal_long)) + _ra_gal
 
     ra, dec = np.degrees([ra, dec])

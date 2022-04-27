@@ -18,7 +18,7 @@ class NumberLine:
 
     def __init__(self, magnitude: float, starting_position: float = 0):
         self.magnitude = magnitude
-        self.starting_position = starting_position
+        self.start = starting_position
 
     def magnitude_without_direction(self):
         if not isinstance(self.magnitude, float):
@@ -27,23 +27,24 @@ class NumberLine:
         if self.magnitude < 0:
             raise err.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
 
-        obj_position_positive = self.starting_position + self.magnitude
-        obj_position_negative = self.starting_position - self.magnitude
+        positive_position = self.start + self.magnitude
+        negative_position = self.start - self.magnitude
 
-        print(f'The starting position is {self.starting_position}.\n'
-              f'With no direction specified, the object can have either {obj_position_negative} or {obj_position_positive} position.')
+        print(f'The starting position is {self.start}.\n'
+              f'With no direction specified, the object can have either '
+              f'{negative_position} or {positive_position} position.')
 
-        return [obj_position_positive, obj_position_negative]
+        return [positive_position, negative_position]
 
     def magnitude_with_direction(self):
         if not isinstance(self.magnitude, float):
             raise err.FloatNotPassed('Parameter type should be of float type.')
 
-        obj_position = self.starting_position + self.magnitude
+        obj_position = self.start + self.magnitude
 
-        print(
-            f'The starting position of the object is {self.starting_position}.\n With a magnitude of '
-            f'{self.magnitude}, the final position of the object is {obj_position}.')
+        print(f'The starting position of the object is {self.start}.\n With a '
+              f'magnitude of {self.magnitude}, the final position of the object is '
+              f'{obj_position}.')
 
         return obj_position
 
@@ -52,14 +53,20 @@ class NumberLine:
             raise err.FloatNotPassed('Parameter type should be of float type.')
 
         if self.magnitude < 0:
-            raise err.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
+            print('Magnitude cannot be negative with a given direction, assuming '
+                  'positive')
+            self.magnitude = abs(self.magnitude)
 
         if direction not in ['positive', 'negative']:
-            raise err.DirectionIsNotPosNeg('Direction can either be positive or negative only.')
+            raise err.DirectionIsNotPosNeg('Direction should be positive or negative.')
 
-        obj_position = self.starting_position - self.magnitude if direction == 'negative' else self.starting_position + self.magnitude
+        if direction == 'negative':
+            pos = self.start - self.magnitude
+        else:
+            pos = self.start + self.magnitude
 
-        print(f'The starting position of the object is {self.starting_position}.\n'
-              f'With a magnitude of {self.magnitude} and a {direction} direction, the current position is {obj_position}.')
+        print(f'The starting position of the object is {self.start}.\n'
+              f'With a magnitude of {self.magnitude} and a {direction} direction, '
+              f'the current position is {pos}.')
 
-        return obj_position
+        return pos

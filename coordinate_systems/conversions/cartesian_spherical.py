@@ -14,7 +14,8 @@ def spherical_to_cartesian(spherical_coordinates, deg_rad: str = 'rad'):
     spherical_coordinates:
         A tuple containing spherical coordinates.
     deg_rad: str, optional
-        Indication whether the input coordinates are in degrees or radians. The default is 'rad'.
+        Indication whether the input coordinates are in degrees or radians. The default
+        is 'rad'.
 
     Returns
     -------
@@ -23,8 +24,10 @@ def spherical_to_cartesian(spherical_coordinates, deg_rad: str = 'rad'):
 
     """
 
+    sc_ = spherical_coordinates
+
     # convert from degrees to radians (only theta and phi parameters)
-    cs_ = np.append(spherical_coordinates[0], np.deg2rad(spherical_coordinates[1:])) if deg_rad == 'deg' else np.array(spherical_coordinates)
+    cs_ = np.append(sc_[0], np.deg2rad(sc_[1:])) if deg_rad == 'deg' else np.array(sc_)
 
     # reinitialize the coordinates
     rho, theta, phi = cs_.flatten()

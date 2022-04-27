@@ -4,8 +4,6 @@ Created on Thu Apr  1 03:05:09 2021
 
 import numpy as np
 
-import utilities
-
 
 def distance_formula(initial_coordinates, final_coordinates=None, deg_rad: str = 'rad'):
     """

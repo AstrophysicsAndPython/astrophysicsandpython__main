@@ -35,5 +35,9 @@ class HmsIsNegative(BaseErrorClass):
     pass
 
 
+class HmsIsGreaterThan24(BaseErrorClass):
+    pass
+
+
 class NegativeValueFound(BaseErrorClass):
     pass

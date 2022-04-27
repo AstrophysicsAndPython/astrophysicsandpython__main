@@ -43,4 +43,5 @@ def HmsIsNegative():
 
 
 def NegativeValueFound():
-    print(f'Raised NegativeValueFound error: Found negative sum, these parameters can not have a negative sum.')
+    print(f'Raised NegativeValueFound error: Found negative sum, these parameters can'
+          f'not have a negative sum.')
