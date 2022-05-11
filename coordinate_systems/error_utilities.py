@@ -43,7 +43,8 @@ def check_list_len_3d(list_to_check):
 
 def ensure_theta(theta: Union[list, float]):
     # in part taken from https://stackoverflow.com/a/50457453
-    return [x % (2 * np.pi) for x in theta] if isinstance(theta, list) else theta % (2 * np.pi)
+    return [x % (2 * np.pi) for x in theta] if isinstance(theta, list) else theta % (
+            2 * np.pi)
 
 
 def ensure_phi(phi: Union[list, float]):
@@ -54,4 +55,5 @@ def ensure_phi(phi: Union[list, float]):
 def ensure_positive(args):
     _sum = np.sum(args, axis=0)
     if any(x < 0 for x in _sum):
-        raise NegativeValueFound('Found negative sum, these parameters can not have a negative sum.')
+        raise NegativeValueFound('Found negative sum, these parameters can not have a '
+                                 'negative sum.')
