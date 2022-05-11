@@ -7,64 +7,66 @@ import numpy as np
 
 np_arr = np.ndarray
 
+FloatStr = Union[float, str]
+FloatStrArr = Union[float, str, np_arr]
 
-def string_or_not(in_obj: Union[float, str], in_type: str = 'dms') -> float:
+
+def change_instance(in_obj: FloatStr, in_type: str = 'dms') -> float:
     """
     Check if given input is DMS/HMS string and convert it to float.
 
     Parameters
     ----------
-    in_obj: Union[float, str]
+    in_obj : FloatStr
         Input object as HMS/DMS.
-    in_type: str
-        Type of conversion. Default is 'dms'.
+    in_type : str, optional
+        Type of conversion. The default is 'dms'.
 
     Returns
     -------
-    float:
-        Degree decimal for the input dms/hms object.
+    float
+        DESCRIPTION.
 
     """
     if isinstance(in_obj, str):
-        out = dms__dd(in_obj) if in_type == 'dms' else hms__dd(in_obj)
+        out = dms2dd(in_obj) if in_type == 'dms' else hms2dd(in_obj)
     else:
         out = in_obj
 
     return out
 
 
-def altitude_to_zenith_angle(altitude: Union[float, str, np_arr], deg_rad: bool = True):
+def altitude2zenith(altitude: FloatStrArr, deg_rad: bool = True) -> float:
     """
     Convert the given altitude to its complementary zenith angle.
 
 
     Parameters
     ----------
-    altitude : Union[float, str, np_arr]
+    altitude : FloatStrArr
         Altitude of the given celestial object.
     deg_rad : bool, optional
         Whether the given altitude measurement is in degrees or radians. Default is True.
 
     Returns
     -------
-    object :
+    float
         Complementary zenith angle for the corresponding altitude angle.
 
     """
 
-    altitude = dms__dd(altitude) if type(altitude) == str else altitude
+    altitude = change_instance(altitude, 'dms')
 
     return 90 - altitude if deg_rad else np.pi / 2 - altitude
 
 
-def zenith_angle_to_altitude(zenith_angle: Union[float, str, np_arr],
-                             deg_rad: bool = True):
+def zenith2altitude(zenith_angle: FloatStrArr, deg_rad: bool = True) -> float:
     """
     Convert the given zenith angle to its complementary altitude angle.
 
     Parameters
     ----------
-    zenith_angle : Union[float, str, np_arr]
+    zenith_angle : FloatStrArr
         Zenith angle of the given celestial object.
     deg_rad : bool, optional
         Whether the given zenith angle measurement is in degrees or radians.
@@ -72,17 +74,17 @@ def zenith_angle_to_altitude(zenith_angle: Union[float, str, np_arr],
 
     Returns
     -------
-    float
+    float :
         Complementary altitude angle for the corresponding zenith angle.
 
     """
 
-    zenith_angle = dms__dd(zenith_angle) if type(zenith_angle) == str else zenith_angle
+    zenith_angle = dms2dd(zenith_angle) if type(zenith_angle) == str else zenith_angle
 
     return 90 - zenith_angle if deg_rad else np.pi / 2 - zenith_angle
 
 
-def dms__dd(dms: str) -> float:
+def dms2dd(dms: str) -> float:
     """
     Convert given degree minute second to degree decimal format.
 
@@ -111,7 +113,7 @@ def dms__dd(dms: str) -> float:
     return deg + minute / 60 + sec / 3600
 
 
-def dd__dms(degree_decimal: float) -> str:
+def dd2dms(degree_decimal: float) -> str:
     """
     Convert given degree decimal format to degree minute seconds.
 
@@ -152,7 +154,7 @@ def dd__dms(degree_decimal: float) -> str:
     return f'{int(_d)}:{int(_m)}:{_s}'
 
 
-def hms__dd(hms: str) -> float:
+def hms2dd(hms: str) -> float:
     """
     Convert a given hour-minute-second string to degree decimal.
 
@@ -178,7 +180,7 @@ def hms__dd(hms: str) -> float:
     return hour * 15 + (minute / 4) + (sec / 240)
 
 
-def dd__hms(degree_decimal: float) -> str:
+def dd2hms(degree_decimal: float) -> str:
     """
     Convert degree decimal to its corresponding HMS notation.
 
@@ -224,17 +226,17 @@ def dd__hms(degree_decimal: float) -> str:
     return f'{int(_d)}:{int(_m)}:{_s}'
 
 
-def RA_2_HA(right_ascension: Union[float, str], local_time: Union[float, str]) -> str:
+def RA2HA(right_ascension: FloatStr, local_time: FloatStr) -> str:
     """
     Converts right ascension to its corresponding hour angle value depending upon the
     given local time.
 
     Parameters
     ----------
-    right_ascension : Union[float, str]
+    right_ascension : FloatStr
         Right ascension value for the celestial object. It can either be a string with
         HH:MM:SS format or a float number representing the right ascension value.
-    local_time : Union[float, str]
+    local_time : FloatStr
         Local time for the observer.
 
     Returns
@@ -244,26 +246,25 @@ def RA_2_HA(right_ascension: Union[float, str], local_time: Union[float, str]) -
 
     """
 
-    _ra = hms__dd(right_ascension) if type(right_ascension) == str else right_ascension
-    _lt = hms__dd(local_time) if type(local_time) == str else local_time
+    _ra = change_instance(right_ascension, 'hms')
+    _lt = change_instance(local_time, 'hms')
 
     if _ra > _lt:
         _lt += 360
 
-    return dd__hms(_lt - _ra)
+    return dd2hms(_lt - _ra)
 
 
-def HA_2_RA(hour_angle, local_time):
+def HA2RA(hour_angle: FloatStrArr, local_time: FloatStr) -> str:
     """
     Converts hour angle to its corresponding right ascension value depending upon the
     given local time.
 
     Parameters
     ----------
-    hour_angle : str, float
-        Hour angle value for the celestial object. It can either be a string with
-        HH:MM:SS format or a float number representing the hour angle value.
-    local_time : str, float
+    hour_angle : FloatStr
+        Hour angle value for the celestial object.
+    local_time : FloatStr
         Local time for the observer.
 
     Returns
@@ -271,12 +272,17 @@ def HA_2_RA(hour_angle, local_time):
     str
         Right ascension value of the object in the sky according to observer's local time.
 
+    Notes
+    -------
+        The hour_angle and local_time parameters can either be a string with HH:MM:SS
+        format or a float number representing the degree decimal representation of
+        their values.
     """
 
-    _ha = hms__dd(hour_angle) if type(hour_angle) == str else hour_angle
-    _lt = hms__dd(local_time) if type(local_time) == str else local_time
+    _ha = change_instance(hour_angle, 'hms')
+    _lt = change_instance(local_time, 'hms')
 
     if _ha > _lt:
         _lt += 360
 
-    return dd__hms(_lt - _ha)
+    return dd2hms(_lt - _ha)

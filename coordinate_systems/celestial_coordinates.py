@@ -22,7 +22,9 @@ def equatorial__horizontal(observer_latitude: FloatStr,
                            right_ascension: FloatStr = None,
                            hour_angle: FloatStr = None,
                            local_time: FloatStr = None,
-                           out: str = 'altitude') -> Tuple[str, str]:
+                           output_parameter: str = 'altitude',
+                           output_type: type = str) -> Union[Tuple[str, str],
+                                                             Tuple[float, float]]:
     """
     Convert the given equatorial coordinates to horizontal coordinates.
 
@@ -38,8 +40,10 @@ def equatorial__horizontal(observer_latitude: FloatStr,
         Hour angle of the celestial object. The default is None.
     local_time : FloatStr, optional
         Local time for the observer. The default is None.
-    out : str, optional
+    output_parameter : str, optional
         Whether to give altitude or zenith angle as output. The default is 'altitude'.
+    output_type : type
+        Whether the output should be in string or float. Default is str.
 
     Raises
     ------
@@ -50,22 +54,22 @@ def equatorial__horizontal(observer_latitude: FloatStr,
 
     Returns
     -------
-    Tuple[str]
+    Union[Tuple[str, str], Tuple[float, float]]
         Horizontal coordinates of the celestial object.
 
     """
-    declination = utils.dms__dd(declination)
-    latitude = utils.dms__dd(observer_latitude)
-    out = out.lower()
+    declination, latitude = [utils.change_instance(i) for i in
+                             [declination, observer_latitude]]
+    output_parameter = output_parameter.lower()
 
-    if out not in ['altitude', 'zenith', 'zenith angle']:
+    if output_parameter not in ['altitude', 'zenith', 'zenith angle']:
         raise OutputTypeError('The output type must either be \'altitude\', \'zenith\','
                               ' or \'zenith angle\'.')
 
     if None not in [right_ascension, hour_angle]:
         print('Both right_ascension and hour_angle parameters are provided.\n'
               'Using hour_angle for calculations.')
-        hour_angle = utils.hms__dd(hour_angle) if type(hour_angle) == str else hour_angle
+        hour_angle = utils.change_instance(hour_angle, 'hms')
 
     if right_ascension is None and hour_angle is None:
         raise IncompleteArguments('Either right_ascension or hour_angle must be '
@@ -76,9 +80,10 @@ def equatorial__horizontal(observer_latitude: FloatStr,
                                   'local_time argument')
 
     if hour_angle is None:
-        hour_angle = utils.hms__dd(utils.RA_2_HA(right_ascension, local_time))
+        hour_angle = utils.RA2HA(right_ascension, local_time)
+        hour_angle = utils.change_instance(hour_angle, 'hms')
     else:
-        hour_angle = utils.hms__dd(hour_angle)
+        hour_angle = utils.change_instance(hour_angle, 'hms')
 
     latitude, hour_angle, declination = np.radians([latitude, hour_angle, declination])
 
@@ -94,20 +99,19 @@ def equatorial__horizontal(observer_latitude: FloatStr,
 
     altitude = np.degrees(np.arcsin(altitude))
 
-    alt = altitude if out == 'altitude' else utils.altitude_to_zenith_angle(altitude)
-
-    _dir = 'E' if azimuth > 0 else 'W'
-
-    azimuth = np.abs(azimuth)
+    alt = altitude if output_parameter == 'altitude' else utils.altitude2zenith(altitude)
 
     azimuth = 180 - azimuth if latitude < 0 else azimuth
 
-    return f'{utils.dd__dms(azimuth)} {_dir}', utils.dd__dms(alt)
+    if output_type == str:
+        azimuth, alt = [utils.dd2dms(i) for i in [azimuth, alt]]
+
+    return azimuth, alt
 
 
 def horizontal__equatorial(observer_latitude: FloatStr,
                            azimuth: FloatStr,
-                           altitude: FloatStr,
+                           altitude: FloatStr = None,
                            local_time: FloatStr = None,
                            zenith_angle: FloatStr = None,
                            out: str = 'ha'):
@@ -126,7 +130,7 @@ def horizontal__equatorial(observer_latitude: FloatStr,
         Local time for the observer. If specified, the output will be changed to RA.
         The default is None.
     zenith_angle : FloatStr, optional
-        Zenith angle for the celestial object. If specified, it will given preference
+        Zenith angle for the celestial object. If specified, it will be given preference
         over the altitude. The default is None.
     out : str, optional
         Whether to give hour angle or right ascension as the output. The default is
@@ -153,15 +157,18 @@ def horizontal__equatorial(observer_latitude: FloatStr,
             print('local_time defined. The output will be changed to RA value.')
             out = 'ra'
 
-    lat, az, alt = [utils.string_or_not(i, 'dms') for i in [observer_latitude, azimuth,
-                                                            altitude]]
+    if altitude is None and zenith_angle is None:
+        raise IncompleteArguments('Either zenith_angle or altitude must be provided.')
+
+    lat, az, alt = [utils.change_instance(i, 'dms') for i in [observer_latitude, azimuth,
+                                                              altitude]]
 
     if None not in [altitude, zenith_angle]:
         print('Both zenith_angle and altitude parameters are provided.\n'
               'Using zenith_angle for calculations.')
-        zenith_angle = utils.string_or_not(zenith_angle, 'dms')
+        zenith_angle = utils.change_instance(zenith_angle, 'dms')
     else:
-        zenith_angle = utils.altitude_to_zenith_angle(alt)
+        zenith_angle = utils.altitude2zenith(alt)
 
         zenith_angle = -zenith_angle if lat < 0 else zenith_angle
 
@@ -185,14 +192,13 @@ def horizontal__equatorial(observer_latitude: FloatStr,
     declination, hour_angle = np.degrees([declination, hour_angle])
 
     if out in ['ra', 'right ascension']:
-        hour_angle = utils.HA_2_RA(hour_angle=hour_angle,
-                                   local_time=local_time)
+        hour_angle = utils.HA2RA(hour_angle=hour_angle, local_time=local_time)
 
-    return utils.dd__hms(hour_angle), utils.dd__dms(declination)
+    return utils.dd2hms(hour_angle), utils.dd2dms(declination)
 
 
 def equatorial__ecliptic(right_ascension, declination):
-    ra, dec = utils.hms__dd(right_ascension), utils.dms__dd(declination)
+    ra, dec = utils.hms2dd(right_ascension), utils.dms2dd(declination)
 
     ec_latitude = np.arcsin(
             np.sin(dec) * np.cos(_ecliptic) - np.cos(dec) * np.sin(_ecliptic) * np.sin(
@@ -205,12 +211,12 @@ def equatorial__ecliptic(right_ascension, declination):
 
     ec_latitude, ec_longitude = np.degrees([ec_latitude, ec_longitude])
 
-    return utils.dd__dms(ec_latitude), utils.dd__dms(ec_longitude)
+    return utils.dd2dms(ec_latitude), utils.dd2dms(ec_longitude)
 
 
 def ecliptic__equatorial(ecliptic_latitude, ecliptic_longitude):
-    ec_latitude = utils.dms__dd(ecliptic_latitude)
-    ec_longitude = utils.dms__dd(ecliptic_longitude)
+    ec_latitude = utils.dms2dd(ecliptic_latitude)
+    ec_longitude = utils.dms2dd(ecliptic_longitude)
 
     dec = np.arcsin(
             np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(
@@ -229,11 +235,11 @@ def ecliptic__equatorial(ecliptic_latitude, ecliptic_longitude):
 
     ra, dec = np.degrees([ra, dec])
 
-    return utils.dd__hms(ra), utils.dd__dms(dec)
+    return utils.dd2hms(ra), utils.dd2dms(dec)
 
 
 def equatorial__galactic(right_ascension, declination):
-    ra, dec = utils.hms__dd(right_ascension), utils.dms__dd(declination)
+    ra, dec = utils.hms2dd(right_ascension), utils.dms2dd(declination)
 
     gal_long = np.arctan2(np.cos(dec) * np.sin(ra - _ra_gal),
                           np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(
@@ -246,11 +252,11 @@ def equatorial__galactic(right_ascension, declination):
 
     gal_long, gal_lat = np.degrees([gal_long, gal_lat])
 
-    return utils.dd__dms(gal_long), utils.dd__dms(gal_lat)
+    return utils.dd2dms(gal_long), utils.dd2dms(gal_lat)
 
 
 def galactic__equatorial(galactic_latitude, galactic_longitude):
-    gal_lat, gal_long = [utils.dms__dd(i) for i in
+    gal_lat, gal_long = [utils.dms2dd(i) for i in
                          [galactic_latitude, galactic_longitude]]
 
     dec = np.arcsin(
@@ -264,4 +270,4 @@ def galactic__equatorial(galactic_latitude, galactic_longitude):
 
     ra, dec = np.degrees([ra, dec])
 
-    return utils.dd__hms(ra), utils.dd__dms(dec)
+    return utils.dd2hms(ra), utils.dd2dms(dec)
