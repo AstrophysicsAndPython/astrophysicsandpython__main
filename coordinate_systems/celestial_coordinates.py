@@ -11,10 +11,9 @@ from conversion_errors import IncompleteArguments, OutputTypeError
 
 FloatStr = Union[float, str]
 
-_ecliptic, _ra_gal, _dec_gal, _long_ncp = np.radians([23.43927944,
-                                                      192.85948,
-                                                      27.12825,
-                                                      122.93192])
+_ra_gal, _dec_gal, _long_ncp = np.radians([192.85948,
+                                           27.12825,
+                                           122.93192])
 
 
 def equatorial__horizontal(observer_latitude: FloatStr,
@@ -197,45 +196,111 @@ def horizontal__equatorial(observer_latitude: FloatStr,
     return utils.dd2hms(hour_angle), utils.dd2dms(declination)
 
 
-def equatorial__ecliptic(right_ascension, declination):
-    ra, dec = utils.hms2dd(right_ascension), utils.dms2dd(declination)
+def equatorial__ecliptic(right_ascension: FloatStr,
+                         declination: FloatStr,
+                         output_type: type = str,
+                         ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
+                                                                    Tuple[float, float]]:
+    """
+    Convert equatorial coordinates of an object to corresponding ecliptic coordinates.
 
-    ec_latitude = np.arcsin(
-            np.sin(dec) * np.cos(_ecliptic) - np.cos(dec) * np.sin(_ecliptic) * np.sin(
-                    ra))
+    Parameters
+    ----------
+    right_ascension : FloatStr
+        Right ascension of the celestial object.
+    declination : FloatStr
+        Declination of the celestial object.
+    output_type : type, optional
+        Whether the output should be in string format DMS or in degree decimal.
+        The default is str.
+    ecliptic : FloatStr, optional
+        The value for the obliquity of the ecliptic. The default is 23.43927944.
 
-    _num, _den = (
-        np.sin(ra) * np.cos(_ecliptic) + np.tan(dec) * np.sin(_ecliptic), np.cos(ra))
-
-    ec_longitude = np.arcsin(_num / _den)
-
-    ec_latitude, ec_longitude = np.degrees([ec_latitude, ec_longitude])
-
-    return utils.dd2dms(ec_latitude), utils.dd2dms(ec_longitude)
+    Returns
+    -------
+    Union[Tuple[str, str], Tuple[float, float]]
+        The ecliptic coordinates of the given equatorial coordinates.
 
 
-def ecliptic__equatorial(ecliptic_latitude, ecliptic_longitude):
-    ec_latitude = utils.dms2dd(ecliptic_latitude)
-    ec_longitude = utils.dms2dd(ecliptic_longitude)
+    """
 
-    dec = np.arcsin(
-            np.sin(ec_latitude) * np.cos(_ecliptic) + np.cos(ec_latitude) * np.sin(
-                    _ecliptic) * np.sin(ec_longitude))
+    ra = utils.change_instance(right_ascension, 'hms')
+    dec = utils.change_instance(declination)
+    ecliptic = utils.change_instance(ecliptic)
 
-    _num, _den = (np.cos(ec_latitude) * np.sin(ec_longitude) * np.cos(_ecliptic) -
-                  np.sin(ec_latitude) * np.sin(_ecliptic),
-                  np.cos(ec_latitude) * np.cos(ec_longitude))
+    ra, dec, ecliptic = [np.radians(i) for i in [ra, dec, ecliptic]]
+
+    lat = np.sin(dec) * np.cos(ecliptic)
+    lat -= np.cos(dec) * np.sin(ecliptic) * np.sin(ra)
+
+    lat = np.arcsin(lat)
+
+    _num = np.sin(ra) * np.cos(ecliptic)
+    _num += np.tan(dec) * np.sin(ecliptic)
+
+    _den = np.cos(ra)
+
+    long = np.arctan2(_num, _den)
+
+    lat, long = np.degrees([lat, long])
+
+    if output_type == str:
+        lat, long = utils.dd2dms(lat), utils.dd2dms(long)
+
+    return lat, long
+
+
+def ecliptic__equatorial(latitude: FloatStr,
+                         longitude: FloatStr,
+                         output_type: type = str,
+                         ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
+                                                                    Tuple[float, float]]:
+    """
+    Convert ecliptic coordinates of an object to corresponding equatorial coordinates.
+
+
+    Parameters
+    ----------
+    latitude : FloatStr
+        Latitude of the celestial object.
+    longitude : FloatStr
+        Longitude of the celestial object.
+    output_type : type, optional
+        Whether the output should be in string format DMS or in degree decimal.
+        The default is str.
+    ecliptic : FloatStr, optional
+        The value for the obliquity of the ecliptic. The default is 23.43927944.
+
+    Returns
+    -------
+    Union[Tuple[str, str], Tuple[float, float]]
+        The ecliptic coordinates of the given equatorial coordinates.
+
+    """
+    lat = utils.change_instance(latitude)
+    long = utils.change_instance(longitude)
+    ecliptic = utils.change_instance(ecliptic)
+
+    lat, long, ecliptic = np.radians([lat, long, ecliptic])
+
+    dec = np.sin(lat) * np.cos(ecliptic)
+    dec += np.cos(lat) * np.sin(ecliptic) * np.sin(long)
+
+    dec = np.arcsin(dec)
+
+    _num = np.sin(long) * np.cos(ecliptic)
+    _num -= np.tan(lat) * np.sin(ecliptic)
+
+    _den = np.cos(long)
 
     _ra = np.arctan2(_num, _den)
 
-    ra = _ra + 2 * np.pi if _ra < 0 else _ra
+    ra, dec = np.degrees([_ra, dec])
 
-    # if ra < 0:
-    #     ra = ra + 2 * np.pi
+    if output_type == str:
+        ra, dec = utils.dd2hms(ra), utils.dd2dms(dec)
 
-    ra, dec = np.degrees([ra, dec])
-
-    return utils.dd2hms(ra), utils.dd2dms(dec)
+    return ra, dec
 
 
 def equatorial__galactic(right_ascension, declination):
