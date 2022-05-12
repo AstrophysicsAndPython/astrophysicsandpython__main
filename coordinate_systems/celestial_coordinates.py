@@ -323,6 +323,11 @@ def equatorial__galactic(right_ascension: FloatStr,
     _dec_gal : float
         Declination value for the galactic center. The default is 27.12825.
 
+    Raises
+    -------
+    OutputTypeError:
+        Raised when the output_type parameter is neither str nor float type.
+
     Returns
     -------
     Union[Tuple[str, str], Tuple[float, float]]
@@ -331,6 +336,9 @@ def equatorial__galactic(right_ascension: FloatStr,
     """
     ra = utils.change_instance(right_ascension, 'hms')
     dec = utils.change_instance(declination)
+
+    if output_type not in [str, float]:
+        raise OutputTypeError('The output_type parameter must either be str or float.')
 
     ra, dec, _ra_gal, _dec_gal = np.radians([ra, dec, _ra_gal, _dec_gal])
 
@@ -357,21 +365,60 @@ def equatorial__galactic(right_ascension: FloatStr,
 def galactic__equatorial(galactic_latitude: FloatStr,
                          galactic_longitude: FloatStr,
                          output_type: type = str,
-                         _ra_gal: float = 192.85948,
-                         _dec_gal: float = 27.12825) -> Union[Tuple[str, str],
+                         _ra_NGP: float = 192.85948,
+                         _dec_NGP: float = 27.12825) -> Union[Tuple[str, str],
                                                               Tuple[float, float]]:
-    gal_lat, gal_long = [utils.dms2dd(i) for i in
-                         [galactic_latitude, galactic_longitude]]
+    """
+    Convert the equatorial coordinates of a celestial object to their galactic
+    counterparts.
 
-    dec = np.arcsin(
-            np.sin(gal_lat) * np.sin(_dec_gal) + np.cos(gal_lat) * np.cos(
-                    _dec_gal) * np.cos(_long_ncp - gal_long))
+    Parameters
+    ----------
+    galactic_latitude : FloatStr
+        Galactic latitude of the celestial object.
+    galactic_longitude :
+        Galactic longitude of the celestial object
+    output_type : type
+        Whether the equatorial coordinates should be in HMS/DMS string format or degree
+        decimal format.
+    _ra_NGP : float, optional
+        Right ascension value for the North Galactic Pole. The default value if 192.85948.
+    _dec_NGP : float, optional
+        Declination value for the North Galactic Pole. The default value if 27.12825.
 
-    ra = np.arctan2(np.cos(gal_lat) * np.sin(_long_ncp - gal_long),
-                    np.sin(gal_lat) * np.cos(_dec_gal) - np.cos(gal_lat) * np.sin(
-                            _dec_gal) * np.cos(
-                            _long_ncp - gal_long)) + _ra_gal
+    Raises
+    -------
+    OutputTypeError:
+        Raised when the output_type parameter is neither str nor float type.
+
+    Returns
+    -------
+    Union[Tuple[str, str], Tuple[float, float]]
+        Equatorial coordinates (RA, Dec) for the input galactic coordinates.
+
+    """
+
+    if output_type not in [str, float]:
+        raise OutputTypeError('The output_type parameter must either be str or float.')
+
+    b, long = [utils.change_instance(i) for i in [galactic_latitude, galactic_longitude]]
+
+    b, long, _ra_NGP, _dec_NGP = np.radians([b, long, _ra_NGP, _dec_NGP])
+
+    dec = np.sin(_dec_NGP) * np.sin(b)
+    dec += np.cos(_dec_NGP) * np.cos(b) * np.cos(_long_ncp - long)
+
+    dec = np.arcsin(dec)
+
+    _num = np.cos(b) * np.sin(_long_ncp - long)
+    _den = np.cos(_dec_NGP) * np.sin(b)
+    _den -= np.sin(_dec_NGP) * np.cos(b) * np.cos(_long_ncp - long)
+
+    ra = np.arctan2(_num, _den)
 
     ra, dec = np.degrees([ra, dec])
 
-    return utils.dd2hms(ra), utils.dd2dms(dec)
+    if output_type == str:
+        ra, dec = utils.dd2hms(ra), utils.dd2dms(dec)
+
+    return ra, dec
