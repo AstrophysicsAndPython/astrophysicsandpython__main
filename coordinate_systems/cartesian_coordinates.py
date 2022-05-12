@@ -3,10 +3,8 @@ Created on Thu Mar 24 09:06:45 2021
 
 """
 
-import numpy as np
-
+import error_utilities as e_utils
 import errors.errors__the_number_line as eb
-from coordinate_systems.error_utilities import check_list_len_3d
 
 
 def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
@@ -18,7 +16,8 @@ def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
     final_coordinates :
         position of the object in the space under observation
     initial_coordinates :
-        reference coordinates according to which the distance is to be calculated. Default is (0,0,0).
+        reference coordinates according to which the distance is to be calculated.
+        Default is (0,0,0).
 
     Returns
     -------
@@ -27,17 +26,18 @@ def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
 
     Notes
     -------
-    To use distance_formula_3d for 2D, specify z as 0 in both lists or only give 2 element list.
+        To use distance_formula_3d for 2D, specify z as 0 in both lists or only give 2
+    element list.
 
     """
 
     # check that the final_coordinates passed are either a list/tuple,
-    if not np.logical_or(isinstance(final_coordinates, list), isinstance(final_coordinates, tuple)):
+    if not isinstance(final_coordinates, list) or isinstance(final_coordinates, tuple):
         raise eb.ListNotGiven('Must be either a list or tuple.')
 
     # check and correct the length of the list/tuple passed
     if len(final_coordinates) < 3:
-        final_coordinates = check_list_len_3d(final_coordinates)
+        final_coordinates = e_utils.check_list_len_3d(final_coordinates)
 
     # convert to an immutable object
     final_coordinates = tuple(final_coordinates)

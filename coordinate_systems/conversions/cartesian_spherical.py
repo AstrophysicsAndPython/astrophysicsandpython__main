@@ -61,7 +61,8 @@ def cartesian_to_spherical(rectangular_coordinates):
     # calculate rho
     rho = np.sqrt(x**2 + y**2 + z**2)
 
-    # calculate theta, the reason for using arctan2 is that the range of theta parameter is -180 < theta < 180.
+    # calculate theta, the reason for using arctan2 is that the range of theta
+    # parameter is -180 < theta < 180.
     theta = np.arctan2(y, x)
 
     # calculate phi
