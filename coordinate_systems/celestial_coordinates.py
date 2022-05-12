@@ -11,9 +11,7 @@ from conversion_errors import IncompleteArguments, OutputTypeError
 
 FloatStr = Union[float, str]
 
-_ra_gal, _dec_gal, _long_ncp = np.radians([192.85948,
-                                           27.12825,
-                                           122.93192])
+_long_ncp = np.radians([122.93192])
 
 
 def equatorial__horizontal(observer_latitude: FloatStr,
@@ -303,24 +301,65 @@ def ecliptic__equatorial(latitude: FloatStr,
     return ra, dec
 
 
-def equatorial__galactic(right_ascension, declination):
-    ra, dec = utils.hms2dd(right_ascension), utils.dms2dd(declination)
+def equatorial__galactic(right_ascension: FloatStr,
+                         declination: FloatStr,
+                         output_type: type = str,
+                         _ra_gal: float = 192.85948,
+                         _dec_gal: float = 27.12825) -> Union[Tuple[str, str],
+                                                              Tuple[float, float]]:
+    """
+    Convert equatorial coordinates of a celestial object to galactic coordinates.
 
-    gal_long = np.arctan2(np.cos(dec) * np.sin(ra - _ra_gal),
-                          np.sin(dec) * np.cos(_dec_gal) - np.cos(dec) * np.sin(
-                                  _dec_gal) * np.cos(
-                                  ra - _ra_gal)) - _long_ncp
+    Parameters
+    ----------
+    right_ascension : FloatStr,
+        Right ascension of the celestial body.
+    declination : FloatStr
+        Declination of the celestial body.
+    output_type : str
+        Whether the output should be a string of DMS or in degree decimal format.
+    _ra_gal : float
+        Right ascension value for the galactic center. The default is 192.85948.
+    _dec_gal : float
+        Declination value for the galactic center. The default is 27.12825.
 
-    gal_lat = np.arcsin(
-            np.sin(dec) * np.sin(_dec_gal) + np.cos(dec) * np.cos(_dec_gal) * np.cos(
-                    ra - _ra_gal))
+    Returns
+    -------
+    Union[Tuple[str, str], Tuple[float, float]]
+        Galactic coordinates (lat, long) of the input equatorial coordinates.
 
-    gal_long, gal_lat = np.degrees([gal_long, gal_lat])
+    """
+    ra = utils.change_instance(right_ascension, 'hms')
+    dec = utils.change_instance(declination)
 
-    return utils.dd2dms(gal_long), utils.dd2dms(gal_lat)
+    ra, dec, _ra_gal, _dec_gal = np.radians([ra, dec, _ra_gal, _dec_gal])
+
+    _num = np.cos(dec) * np.sin(ra - _ra_gal)
+
+    _den = np.sin(dec) * np.cos(_dec_gal)
+    _den -= np.cos(dec) * np.sin(_dec_gal) * np.cos(ra - _ra_gal)
+
+    long = np.arctan2(_num, _den)
+
+    lat = np.sin(dec) * np.sin(_dec_gal)
+    lat += np.cos(dec) * np.cos(_dec_gal) * np.cos(ra - _ra_gal)
+
+    lat = np.arcsin(lat)
+
+    long, lat = np.degrees([long, lat])
+
+    if output_type == str:
+        long, lat = [utils.dd2dms(i) for i in [long, lat]]
+
+    return long, lat
 
 
-def galactic__equatorial(galactic_latitude, galactic_longitude):
+def galactic__equatorial(galactic_latitude: FloatStr,
+                         galactic_longitude: FloatStr,
+                         output_type: type = str,
+                         _ra_gal: float = 192.85948,
+                         _dec_gal: float = 27.12825) -> Union[Tuple[str, str],
+                                                              Tuple[float, float]]:
     gal_lat, gal_long = [utils.dms2dd(i) for i in
                          [galactic_latitude, galactic_longitude]]
 
