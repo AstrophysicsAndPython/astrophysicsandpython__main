@@ -14,14 +14,14 @@ FloatStr = Union[float, str]
 _long_ncp = np.radians([122.93192])
 
 
-def equatorial__horizontal(observer_latitude: FloatStr,
-                           declination: FloatStr,
-                           right_ascension: FloatStr = None,
-                           hour_angle: FloatStr = None,
-                           local_time: FloatStr = None,
-                           output_parameter: str = 'altitude',
-                           output_type: type = str) -> Union[Tuple[str, str],
-                                                             Tuple[float, float]]:
+def equatorial2horizontal(observer_latitude: FloatStr,
+                          declination: FloatStr,
+                          right_ascension: FloatStr = None,
+                          hour_angle: FloatStr = None,
+                          local_time: FloatStr = None,
+                          output_parameter: str = 'altitude',
+                          output_type: type = str) -> Union[Tuple[str, str],
+                                                            Tuple[float, float]]:
     """
     Convert the given equatorial coordinates to horizontal coordinates.
 
@@ -106,12 +106,12 @@ def equatorial__horizontal(observer_latitude: FloatStr,
     return azimuth, alt
 
 
-def horizontal__equatorial(observer_latitude: FloatStr,
-                           azimuth: FloatStr,
-                           altitude: FloatStr = None,
-                           local_time: FloatStr = None,
-                           zenith_angle: FloatStr = None,
-                           out: str = 'ha'):
+def horizontal2equatorial(observer_latitude: FloatStr,
+                          azimuth: FloatStr,
+                          altitude: FloatStr = None,
+                          local_time: FloatStr = None,
+                          zenith_angle: FloatStr = None,
+                          out: str = 'ha'):
     """
     Convert the given horizontal coordinates to equatorial coordinates.
 
@@ -194,11 +194,11 @@ def horizontal__equatorial(observer_latitude: FloatStr,
     return utils.dd2hms(hour_angle), utils.dd2dms(declination)
 
 
-def equatorial__ecliptic(right_ascension: FloatStr,
-                         declination: FloatStr,
-                         output_type: type = str,
-                         ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
-                                                                    Tuple[float, float]]:
+def equatorial2ecliptic(right_ascension: FloatStr,
+                        declination: FloatStr,
+                        output_type: type = str,
+                        ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
+                                                                   Tuple[float, float]]:
     """
     Convert equatorial coordinates of an object to corresponding ecliptic coordinates.
 
@@ -248,11 +248,11 @@ def equatorial__ecliptic(right_ascension: FloatStr,
     return lat, long
 
 
-def ecliptic__equatorial(latitude: FloatStr,
-                         longitude: FloatStr,
-                         output_type: type = str,
-                         ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
-                                                                    Tuple[float, float]]:
+def ecliptic2equatorial(latitude: FloatStr,
+                        longitude: FloatStr,
+                        output_type: type = str,
+                        ecliptic: FloatStr = 23.43927944) -> Union[Tuple[str, str],
+                                                                   Tuple[float, float]]:
     """
     Convert ecliptic coordinates of an object to corresponding equatorial coordinates.
 
@@ -301,12 +301,12 @@ def ecliptic__equatorial(latitude: FloatStr,
     return ra, dec
 
 
-def equatorial__galactic(right_ascension: FloatStr,
-                         declination: FloatStr,
-                         output_type: type = str,
-                         _ra_gal: float = 192.85948,
-                         _dec_gal: float = 27.12825) -> Union[Tuple[str, str],
-                                                              Tuple[float, float]]:
+def equatorial2galactic(right_ascension: FloatStr,
+                        declination: FloatStr,
+                        output_type: type = str,
+                        _ra_gal: float = 192.85948,
+                        _dec_gal: float = 27.12825) -> Union[Tuple[str, str],
+                                                             Tuple[float, float]]:
     """
     Convert equatorial coordinates of a celestial object to galactic coordinates.
 
@@ -362,12 +362,12 @@ def equatorial__galactic(right_ascension: FloatStr,
     return long, lat
 
 
-def galactic__equatorial(galactic_latitude: FloatStr,
-                         galactic_longitude: FloatStr,
-                         output_type: type = str,
-                         _ra_ngp: float = 192.85948,
-                         _dec_ngp: float = 27.12825) -> Union[Tuple[str, str],
-                                                              Tuple[float, float]]:
+def galactic2equatorial(galactic_latitude: FloatStr,
+                        galactic_longitude: FloatStr,
+                        output_type: type = str,
+                        _ra_ngp: float = 192.85948,
+                        _dec_ngp: float = 27.12825) -> Union[Tuple[str, str],
+                                                             Tuple[float, float]]:
     """
     Convert the equatorial coordinates of a celestial object to their galactic
     counterparts.
