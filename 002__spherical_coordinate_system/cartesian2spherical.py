@@ -5,7 +5,7 @@ Created on Thu Apr  1 01:12:40 2021
 import numpy as np
 
 
-def spherical_to_cartesian(spherical_coordinates, deg_rad: str = 'rad'):
+def spherical2cartesian(spherical_coordinates, deg_rad: str = 'rad'):
     """
     Converts spherical coordinates to Cartesian/rectangular coordinates.
 
@@ -40,7 +40,7 @@ def spherical_to_cartesian(spherical_coordinates, deg_rad: str = 'rad'):
     return x, y, z
 
 
-def cartesian_to_spherical(rectangular_coordinates):
+def cartesian2spherical(rectangular_coordinates):
     """
     Converts Cartesian coordinates to spherical coordinates.
 

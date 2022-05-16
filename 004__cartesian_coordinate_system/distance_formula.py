@@ -4,7 +4,6 @@ Created on Thu Mar 24 09:06:45 2021
 """
 
 import error_utilities as e_utils
-import errors.errors__the_number_line as eb
 
 
 def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
@@ -33,7 +32,7 @@ def distance_formula(final_coordinates, initial_coordinates=(0, 0, 0)):
 
     # check that the final_coordinates passed are either a list/tuple,
     if not isinstance(final_coordinates, list) or isinstance(final_coordinates, tuple):
-        raise eb.ListNotGiven('Must be either a list or tuple.')
+        raise e_utils.ListNotGiven('Must be either a list or tuple.')
 
     # check and correct the length of the list/tuple passed
     if len(final_coordinates) < 3:

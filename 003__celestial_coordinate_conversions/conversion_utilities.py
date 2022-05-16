@@ -177,7 +177,7 @@ def hms2dd(hms: str) -> float:
         print('RA value cannot be negative, assuming positive.')
         hour = -hour
 
-    return hour * 15 + (minute / 4) + (sec / 240)
+    return hour * 15 + (minute / 4.) + (sec / 240.)
 
 
 def dd2hms(degree_decimal: float) -> str:

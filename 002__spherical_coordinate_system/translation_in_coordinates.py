@@ -1,43 +1,10 @@
 """
-Created on Thu Apr  1 03:05:09 2021
+Created on May 12 22:49:49 2022
 """
 
 import numpy as np
 
 import error_utilities as e_utils
-
-
-def distance_formula(initial_coordinates, final_coordinates=None, deg_rad: str = 'rad'):
-    """
-    Calculates the distance between two given points in spherical coordinate system
-    Parameters
-    ----------
-    initial_coordinates:
-        Reference coordinates of the point
-    final_coordinates:
-        Final coordinates of the point to which the distance is to be calculated
-    deg_rad:
-        Whether the specified theta and phi arguments are in degree or radians
-    Returns
-    ----------
-    float:
-        Distance between two points in spherical coordinates
-    """
-
-    r1, theta1, phi1 = initial_coordinates
-    r2, theta2, phi2 = final_coordinates
-
-    theta1, phi1 = np.radians([theta1, phi1]) if deg_rad == 'deg' else theta2, phi1
-    theta2, phi2 = np.radians([theta2, phi2]) if deg_rad == 'deg' else theta2, phi2
-
-    p1 = r1**2 + r2**2
-
-    _comp1 = np.sin(theta1) * np.sin(theta2) * np.cos(phi1 - phi2)
-    _comp2 = np.cos(theta1) * np.cos(theta2)
-
-    p2 = 2 * r1 * r2 * (_comp1 + _comp2)
-
-    return np.sqrt(p1 - p2)
 
 
 def translation_in_coordinates(change_in_coordinates, starting_point=(0, 0, 0),

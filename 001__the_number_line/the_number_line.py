@@ -2,7 +2,7 @@
 Created on Wed Mar 24 18:19:25 2021
 """
 
-import errors.errors__the_number_line as err
+import error_utilities as e_utils
 
 
 class NumberLine:
@@ -22,10 +22,10 @@ class NumberLine:
 
     def magnitude_without_direction(self):
         if not isinstance(self.magnitude, float):
-            raise err.FloatNotPassed('Parameter type should be of float type.')
+            raise e_utils.FloatNotPassed('Parameter type should be of float type.')
 
         if self.magnitude < 0:
-            raise err.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
+            raise e_utils.MagnitudeIsLessThanZero('Magnitude cannot be less than 0.')
 
         positive_position = self.start + self.magnitude
         negative_position = self.start - self.magnitude
@@ -38,7 +38,7 @@ class NumberLine:
 
     def magnitude_with_direction(self):
         if not isinstance(self.magnitude, float):
-            raise err.FloatNotPassed('Parameter type should be of float type.')
+            raise e_utils.FloatNotPassed('Parameter type should be of float type.')
 
         obj_position = self.start + self.magnitude
 
@@ -50,7 +50,7 @@ class NumberLine:
 
     def magnitude_with_separate_direction(self, direction: str):
         if not isinstance(self.magnitude, float):
-            raise err.FloatNotPassed('Parameter type should be of float type.')
+            raise e_utils.FloatNotPassed('Parameter type should be of float type.')
 
         if self.magnitude < 0:
             print('Magnitude cannot be negative with a given direction, assuming '
@@ -58,7 +58,7 @@ class NumberLine:
             self.magnitude = abs(self.magnitude)
 
         if direction not in ['positive', 'negative']:
-            raise err.DirectionIsNotPosNeg('Direction should be positive or negative.')
+            raise e_utils.DirectionIsNotPosNeg('Direction should be positive or negative')
 
         if direction == 'negative':
             pos = self.start - self.magnitude

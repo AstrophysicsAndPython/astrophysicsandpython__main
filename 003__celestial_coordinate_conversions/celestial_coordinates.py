@@ -365,8 +365,8 @@ def equatorial__galactic(right_ascension: FloatStr,
 def galactic__equatorial(galactic_latitude: FloatStr,
                          galactic_longitude: FloatStr,
                          output_type: type = str,
-                         _ra_NGP: float = 192.85948,
-                         _dec_NGP: float = 27.12825) -> Union[Tuple[str, str],
+                         _ra_ngp: float = 192.85948,
+                         _dec_ngp: float = 27.12825) -> Union[Tuple[str, str],
                                                               Tuple[float, float]]:
     """
     Convert the equatorial coordinates of a celestial object to their galactic
@@ -381,9 +381,9 @@ def galactic__equatorial(galactic_latitude: FloatStr,
     output_type : type
         Whether the equatorial coordinates should be in HMS/DMS string format or degree
         decimal format.
-    _ra_NGP : float, optional
+    _ra_ngp : float, optional
         Right ascension value for the North Galactic Pole. The default value if 192.85948.
-    _dec_NGP : float, optional
+    _dec_ngp : float, optional
         Declination value for the North Galactic Pole. The default value if 27.12825.
 
     Raises
@@ -403,16 +403,16 @@ def galactic__equatorial(galactic_latitude: FloatStr,
 
     b, long = [utils.change_instance(i) for i in [galactic_latitude, galactic_longitude]]
 
-    b, long, _ra_NGP, _dec_NGP = np.radians([b, long, _ra_NGP, _dec_NGP])
+    b, long, _ra_ngp, _dec_ngp = np.radians([b, long, _ra_ngp, _dec_ngp])
 
-    dec = np.sin(_dec_NGP) * np.sin(b)
-    dec += np.cos(_dec_NGP) * np.cos(b) * np.cos(_long_ncp - long)
+    dec = np.sin(_dec_ngp) * np.sin(b)
+    dec += np.cos(_dec_ngp) * np.cos(b) * np.cos(_long_ncp - long)
 
     dec = np.arcsin(dec)
 
     _num = np.cos(b) * np.sin(_long_ncp - long)
-    _den = np.cos(_dec_NGP) * np.sin(b)
-    _den -= np.sin(_dec_NGP) * np.cos(b) * np.cos(_long_ncp - long)
+    _den = np.cos(_dec_ngp) * np.sin(b)
+    _den -= np.sin(_dec_ngp) * np.cos(b) * np.cos(_long_ncp - long)
 
     ra = np.arctan2(_num, _den)
 
